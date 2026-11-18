@@ -7,27 +7,27 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
 :root{
-  --bg:#f2f4f6; --surface:#ffffff; --surface-2:#e9edf1; --ink:#13202c; --muted:#546372; --line:#d3dbe2;
-  --accent:#0b6e69; --accent-ink:#ffffff; --accent-soft:#d9efed; --warn:#8a5200; --warn-soft:#fbeed8;
-  --font-d:'Space Grotesk','Helvetica Neue',Arial,sans-serif; --font-b:'Inter','Helvetica Neue',Arial,sans-serif; --r:10px;
+  --bg:#f6f5f2; --surface:#ffffff; --surface-2:#efede8; --ink:#1c1e21; --muted:#6b6e73; --line:#e3e0da;
+  --accent:#1f3550; --accent-ink:#ffffff; --accent-soft:#e6ebf1; --warn:#7a5a22; --warn-soft:#f5efe4;
+  --font-d:'Inter','Helvetica Neue',Arial,sans-serif; --font-b:'Inter','Helvetica Neue',Arial,sans-serif; --r:8px;
 }
 @media (prefers-color-scheme: dark){
-  :root{--bg:#0f161d;--surface:#17212b;--surface-2:#1f2b37;--ink:#e8eef3;--muted:#9aa9b7;--line:#2b3947;
-    --accent:#3fb8b0;--accent-ink:#06201e;--accent-soft:#143a38;--warn:#f0b35a;--warn-soft:#3a2b12;color-scheme:dark}
+  :root{--bg:#131416;--surface:#1b1c1e;--surface-2:#242528;--ink:#ecebe8;--muted:#a2a4a8;--line:#323438;
+    --accent:#9fb4cf;--accent-ink:#10161e;--accent-soft:#222a35;--warn:#d2b98a;--warn-soft:#2a2620;color-scheme:dark}
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:16px;line-height:1.55;
   padding:32px max(16px,env(safe-area-inset-left,0px)) 48px}
 main{max-width:960px;margin:0 auto}
 h1,h2{font-family:var(--font-d);line-height:1.2;margin:0;text-wrap:balance}
-h1{font-size:clamp(28px,5vw,40px)}
-h2{font-size:20px}
+h1{font-size:clamp(28px,5vw,40px);font-weight:600;letter-spacing:-.02em}
+h2{font-size:20px;font-weight:600;letter-spacing:-.01em}
 p{margin:0}
 .lead{color:var(--muted);margin-top:10px;max-width:62ch}
-.note{margin-top:18px;background:var(--warn-soft);color:var(--warn);border-radius:var(--r);padding:10px 14px;font-size:14px}
+.note{margin-top:18px;background:var(--surface);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:10px 14px;font-size:14px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:28px}
 a.card{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
   padding:18px;color:inherit;text-decoration:none;transition:border-color .15s,transform .15s}
@@ -39,6 +39,52 @@ a.card:hover,a.card:focus-visible{border-color:var(--accent);transform:translate
 .extra p{color:var(--muted);margin-top:6px}
 .extra a{color:var(--accent);font-weight:600}
 footer{margin-top:32px;color:var(--muted);font-size:13px}
+
+/* ===== Gestaltung (B + C): flach, Haarlinien, keine Kästen, eine Schrift ===== */
+:root,:root:not([data-theme="light"]),:root[data-theme="dark"]{--bg:#ffffff;--surface:#ffffff;--surface-2:#f4f4f2;--ink:#111111;--muted:#6f6f6f;--line:#e4e4e1;
+  --accent:#111111;--accent-ink:#ffffff;--accent-soft:#f4f4f2;--stage:#f1f1ef;--warn:#7a5a22;--warn-soft:#f7f3ea;--bad:#a3271f;--r:0px;color-scheme:light}
+body{-webkit-font-smoothing:antialiased}
+header{border-bottom:1px solid var(--ink);padding-bottom:14px}
+.tag{font-size:11px;letter-spacing:.14em}
+.notice{border:0;padding:0;background:none;font-size:13px;color:var(--muted);border-radius:0}
+.card{border:0;border-top:1px solid var(--line);border-radius:0;padding:20px 0 0;background:none;box-shadow:none}
+.card h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+pre{border-radius:0;background:var(--surface-2)}
+.btn{border-radius:0;border:1px solid var(--ink);background:transparent;color:var(--ink);font-size:13px;padding:8px 14px;box-shadow:none}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn:hover{background:var(--ink);color:#fff}
+.btn.primary:hover{background:#333}
+.btn[aria-pressed="true"]{box-shadow:none}
+.lnk{font:inherit;font-size:13px;background:none;border:0;border-bottom:1px solid transparent;padding:3px 0;color:var(--muted);cursor:pointer;border-radius:0;white-space:nowrap}
+.lnk:hover,.lnk[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.lnk:focus-visible,.rooms button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+.note{border:0;padding:0;background:none;color:var(--muted);font-size:13px;border-radius:0}
+main{max-width:1040px}
+h1{font-size:clamp(34px,6vw,56px);letter-spacing:-.03em}
+.lead{font-size:17px}
+.note{margin-top:14px}
+.grid{display:block;margin-top:48px;border-top:1px solid var(--ink)}
+a.card{display:grid;grid-template-columns:56px minmax(0,1fr) auto;column-gap:16px;row-gap:4px;padding:24px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;transform:none!important}
+a.card .num{grid-row:1/3;color:var(--muted);font-weight:500;font-size:12px;padding-top:6px;font-variant-numeric:tabular-nums}
+a.card h2,a.card p{grid-column:2}
+a.card p{font-size:14px;max-width:62ch}
+a.card .go{grid-column:3;grid-row:1/3;align-self:center;color:var(--ink);font-weight:500;padding:0;margin:0}
+a.card:hover,a.card:focus-visible{border-color:var(--line)}
+a.card:hover h2,a.card:focus-visible h2{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
+.extra{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:24px 0 24px 72px;margin-top:0;background:none}
+.extra a{color:var(--ink);font-weight:500;text-underline-offset:4px}
+footer{margin-top:40px;font-size:12px}
+@media (max-width:600px){a.card{grid-template-columns:36px minmax(0,1fr)}a.card .go{display:none}.extra{padding-left:52px}}
+.extra p{font-size:14px}
+.demo{margin-top:40px}
+.demo-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px;border-top:1px solid var(--ink);padding-top:14px;margin-bottom:14px}
+.demo-head h2{font-size:16px}
+.demo-head a{color:var(--ink);font-size:14px;text-underline-offset:4px}
+.demo iframe{display:block;width:100%;border:0;background:#fff;height:calc(min(1040px,100vw - 32px)*9/16 + 96px)}
+@media (max-width:639px){.demo iframe{height:calc((100vw - 32px)*4/3 + 120px)}}
+.demo-note{font-size:12px;color:var(--muted);margin-top:8px}
+.grid{margin-top:56px}
 </style>
 </head>
 <body>
@@ -46,6 +92,15 @@ footer{margin-top:32px;color:var(--muted);font-size:13px}
   <h1>Exposé Reel</h1>
   <p class="lead">Aus Grundriss und Fotos ein Objektvideo, ein 3D-Puppenhaus und einen begehbaren Rundgang erstellen und auf der eigenen Website einbinden. Hier sind die Prototypen zum Ausprobieren.</p>
   <p class="note">Prototyp-Stand. Die Beispielwohnung ist erfunden, es werden keine Daten gespeichert oder hochgeladen.</p>
+
+  <section class="demo" aria-label="Beispiel-Rundgang">
+    <div class="demo-head">
+      <h2>Beispiel: 3-Zimmer-Wohnung, Leipzig-Plagwitz</h2>
+      <a href="prototypes/04-rundgang-kombi.html">Vollständig öffnen →</a>
+    </div>
+    <iframe src="prototypes/04-rundgang-kombi.html#embed" title="Beispiel-Rundgang durch eine 3-Zimmer-Wohnung" allow="fullscreen"></iframe>
+    <p class="demo-note">Raum im Modell antippen oder unten wählen. Mit „Übersicht“ geht es zurück nach oben. Wohnung und Maße sind erfunden.</p>
+  </section>
 
   <div class="grid">
     <a class="card" href="prototypes/01-expose-reel-video.html">
