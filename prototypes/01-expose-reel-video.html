@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}body{margin:0}</style>
+</head>
+<body>
+<title>Exposé Reel</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: Arbeitsfläche links (4 echte Schritte), Live-Vorschau rechts. Schritt 1: Grundriss oben, darunter ein Fach pro Raum. */
+:root{
+  --bg:#f2f4f6; --surface:#ffffff; --surface-2:#e9edf1; --ink:#13202c; --muted:#546372;
+  --line:#d3dbe2; --accent:#0b6e69; --accent-ink:#ffffff; --accent-soft:#d9efed; --warn:#8a5200; --warn-soft:#fbeed8;
+  --bad:#a3271f; --font-d:'Space Grotesk','Helvetica Neue',Arial,sans-serif; --font-b:'Inter','Helvetica Neue',Arial,sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f161d; --surface:#17212b; --surface-2:#1f2b37; --ink:#e8eef3; --muted:#9aa9b7;
+    --line:#2b3947; --accent:#3fb8b0; --accent-ink:#06201e; --accent-soft:#143a38; --warn:#f0b35a; --warn-soft:#3a2b12; --bad:#ff8a80; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f161d; --surface:#17212b; --surface-2:#1f2b37; --ink:#e8eef3; --muted:#9aa9b7;
+  --line:#2b3947; --accent:#3fb8b0; --accent-ink:#06201e; --accent-soft:#143a38; --warn:#f0b35a; --warn-soft:#3a2b12; --bad:#ff8a80; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+h1,h2,h3{font-family:var(--font-d);margin:0;text-wrap:balance;line-height:1.2}
+h1{font-size:22px;letter-spacing:-.01em}
+h2{font-size:20px;margin-bottom:4px}
+h3{font-size:15px}
+p{margin:0}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
+.tag{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.notice{background:var(--warn-soft);color:var(--warn);border-radius:var(--r);padding:10px 14px;font-size:13px}
+.steps{display:flex;gap:6px;flex-wrap:wrap;padding:0;margin:0;list-style:none}
+.steps button{font:inherit;font-size:13px;display:flex;gap:8px;align-items:center;background:var(--surface);color:var(--muted);
+  border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 8px;cursor:pointer}
+.steps .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;background:var(--surface-2);color:var(--ink)}
+.steps button[aria-current="step"]{color:var(--ink);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.steps button[aria-current="step"] .n{background:var(--accent);color:var(--accent-ink)}
+.steps button.done .n{background:var(--accent-soft);color:var(--accent)}
+.layout{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:900px){.layout{grid-template-columns:minmax(0,1fr) 340px;align-items:start}.side{position:sticky;top:16px}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.sub{color:var(--muted);font-size:14px}
+.grid2{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);min-width:0}
+input[type=text],input[type=number],select,textarea{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);
+  border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:44px}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,.add:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.btn{font:inherit;font-size:14px;font-weight:500;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 16px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.small{font-size:13px;padding:6px 12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:space-between}
+.drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:14px;text-align:center;color:var(--muted);font-size:14px}
+.drop.over,.room.over{border-color:var(--accent);background:var(--accent-soft)}
+.floor{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:640px){.floor{grid-template-columns:200px minmax(0,1fr)}}
+.floor .plan{aspect-ratio:4/3;border-radius:8px;border:1px solid var(--line);background:var(--bg) center/contain no-repeat;display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center;padding:10px}
+.rooms{display:flex;flex-direction:column;gap:10px}
+.room{border:1px solid var(--line);border-radius:var(--r);padding:12px;background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.room.unsorted{border-style:dashed}
+.room.empty .rname{color:var(--muted)}
+.room .head{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.room .head .row{gap:6px}
+.room .rname{font-family:var(--font-d);font-weight:700;font-size:15px;background:transparent;border:1px solid transparent;padding:4px 6px;width:auto;max-width:220px}
+.room .rname:hover{border-color:var(--line)}
+.room .head select{width:auto;font-size:13px;padding:5px 8px}
+.room .qm{font-size:13px;color:var(--muted)}
+.rph{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(108px,1fr))}
+.thumb{aspect-ratio:4/3;border-radius:8px;background-size:cover;background-position:center;position:relative;overflow:hidden;border:1px solid var(--line)}
+.thumb .ex{position:absolute;left:6px;bottom:6px;font-size:11px;background:rgba(0,0,0,.5);color:#fff;border-radius:4px;padding:1px 6px}
+.thumb .rm{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:6px;border:0;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;font:inherit}
+.pcell{display:flex;flex-direction:column;gap:4px;min-width:0}
+.warnbox{font-size:12px;color:var(--warn);background:var(--warn-soft);border-radius:6px;padding:4px 6px;display:flex;flex-direction:column;gap:4px}
+.warnbox button{font:inherit;font-size:12px;border:1px solid var(--warn);background:transparent;color:var(--warn);border-radius:6px;padding:2px 6px;cursor:pointer}
+.add{aspect-ratio:4/3;border:1.5px dashed var(--line);border-radius:8px;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:12px;cursor:pointer;padding:6px}
+.add:hover{border-color:var(--accent);color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:11px;border-radius:999px;padding:1px 8px;background:var(--accent-soft);color:var(--accent)}
+.x{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:8px;width:32px;height:32px;cursor:pointer;flex:none}
+.x:disabled{opacity:.4;cursor:not-allowed}
+.ai{border:1px solid var(--accent);background:var(--accent-soft);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.status{font-size:13px;color:var(--muted);min-height:1.2em}
+.status.err{color:var(--bad)}
+.cover{font-size:13px;color:var(--muted)}
+.cover.warn{color:var(--warn)}
+.choices{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.choice{position:relative}
+.choice input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.choice span{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:var(--r);padding:12px;background:var(--bg);color:var(--ink);font-size:14px}
+.choice span small{color:var(--muted);font-size:12px}
+.choice input:checked+span{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);background:var(--accent-soft)}
+.choice input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.scene{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;border:1px solid var(--line);border-radius:var(--r);padding:10px;background:var(--bg)}
+.scene.off{opacity:.55}
+.scene .body{display:flex;flex-direction:column;gap:8px;min-width:0}
+.scene .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
+.scene .meta select{width:auto}
+.pill{font-size:12px;border-radius:999px;padding:2px 10px;background:var(--surface-2);color:var(--muted)}
+.fixed{border-style:dashed}
+.bar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent)}
+.stage{position:relative;overflow:hidden;border-radius:var(--r);background:#0c1116;width:100%;margin:0 auto}
+.stage .shot{position:absolute;inset:0;background-size:cover;background-position:center}
+.stage .cap{position:absolute;left:0;right:0;bottom:0;padding:28px 16px 14px;color:#fff;font-family:var(--font-d);font-size:clamp(14px,3.2vw,20px);
+  background:linear-gradient(to top,rgba(0,0,0,.6),rgba(0,0,0,0))}
+.fmt-169{aspect-ratio:16/9}.fmt-916{aspect-ratio:9/16;max-width:230px}.fmt-11{aspect-ratio:1/1;max-width:300px}
+canvas.out,video.out{display:block;width:100%;height:auto;border-radius:var(--r);background:#0c1116;margin:0 auto}
+.out.v916{max-width:300px}.out.v11{max-width:420px}
+.sum{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px;margin:0}
+.sum dt{color:var(--muted)}.sum dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.hidden-step{display:none}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Exposé Reel</h1>
+    <span class="tag">Prototyp · Makler erstellen ihr Objektvideo selbst</span>
+  </header>
+  <p class="notice" id="notice">Claude liest den Grundriss, prüft die Fotos und schreibt das Storyboard. Das nutzt dein eigenes Claude-Kontingent, beim ersten Mal wirst du gefragt. Das Video wird in deinem Browser gerendert.</p>
+
+  <ol class="steps" id="steps">
+    <li><button data-go="1"><span class="n">1</span>Objekt</button></li>
+    <li><button data-go="2"><span class="n">2</span>Stil</button></li>
+    <li><button data-go="3"><span class="n">3</span>Storyboard</button></li>
+    <li><button data-go="4"><span class="n">4</span>Video</button></li>
+  </ol>
+
+  <div class="layout">
+    <main>
+      <!-- Schritt 1 -->
+      <section class="panel" id="s1">
+        <div><h2>Objekt, Grundriss und Fotos</h2><p class="sub">Erst den Grundriss hochladen: Claude legt daraus die Räume an. Dann pro Raum die passenden Fotos.</p></div>
+        <div class="grid2">
+          <label>Titel<input type="text" id="f-titel" value="Helle 3-Zimmer-Wohnung mit Balkon"></label>
+          <label>Lage<input type="text" id="f-ort" value="Leipzig-Plagwitz"></label>
+          <label>Objektart<select id="f-art"><option>Eigentumswohnung</option><option>Mietwohnung</option><option>Haus</option><option>Gewerbe</option></select></label>
+          <label>Wohnfläche in m²<input type="number" id="f-qm" value="78" min="10"></label>
+          <label>Zimmer<input type="number" id="f-zi" value="3" min="1"></label>
+          <label>Preis<input type="text" id="f-preis" value="329.000 €"></label>
+        </div>
+        <label>Highlights, durch Komma getrennt<textarea id="f-hl">Südbalkon, Dielenboden, Fußbodenheizung, Stellplatz</textarea></label>
+
+        <div class="floor">
+          <div class="plan" id="plan">Noch kein Grundriss</div>
+          <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+            <h3>1. Grundriss</h3>
+            <p class="sub">Als Bild (JPG, PNG oder WebP). Claude erkennt die Räume, ihre Flächen und einen Rundgang. PDF bitte vorher als Bild speichern.</p>
+            <div class="row">
+              <label style="display:inline;cursor:pointer"><input type="file" id="f-gr" accept="image/jpeg,image/png,image/webp" hidden><span class="btn primary" style="display:inline-block">Grundriss hochladen</span></label>
+              <button class="btn" id="reread" hidden>Erneut lesen</button>
+            </div>
+            <p class="status" id="gr-status">Ohne Grundriss arbeitest du mit der Standard-Raumliste unten.</p>
+            <p class="sub" id="gr-hint" hidden></p>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="row end"><h3>2. Fotos pro Raum</h3><span class="cover" id="cover"></span></div>
+          <div class="drop" id="drop">
+            Fotos direkt in einen Raum ziehen oder dort auf „+ Fotos“ tippen. Du kannst auch alle auf einmal
+            <label style="display:inline;color:var(--accent);cursor:pointer;text-decoration:underline">hier hochladen<input type="file" id="f-fotos" accept="image/jpeg,image/png,image/webp" multiple hidden></label>
+            und Claude sortieren lassen.
+          </div>
+          <div class="rooms" id="rooms"></div>
+          <div class="row"><button class="btn small" id="add-room">Raum hinzufügen</button></div>
+        </div>
+
+        <div class="ai">
+          <div class="row end"><strong>3. Fotos prüfen lassen</strong><button class="btn primary" id="check">Zuordnung von Claude prüfen</button></div>
+          <p class="status" id="chk-status">Claude sortiert unsortierte Fotos ein, meldet falsch zugeordnete und notiert sichtbare Merkmale.</p>
+          <div id="ana-out" hidden></div>
+        </div>
+        <div class="row end"><span></span><button class="btn primary" data-go="2">Weiter zum Stil</button></div>
+      </section>
+
+      <!-- Schritt 2 -->
+      <section class="panel hidden-step" id="s2">
+        <div><h2>Stil und Ton</h2><p class="sub">Alles, was der Makler selbst einstellt, ohne Prompts.</p></div>
+        <div><h3 style="margin-bottom:8px">Look</h3><div class="choices" id="c-stil"></div></div>
+        <div><h3 style="margin-bottom:8px">Format</h3><div class="choices" id="c-fmt"></div></div>
+        <div class="grid2">
+          <label>Länge<select id="f-len"><option value="15">15 Sekunden</option><option value="30" selected>30 Sekunden</option><option value="45">45 Sekunden</option><option value="60">60 Sekunden</option></select></label>
+          <label>Sprache<select id="f-lang"><option value="de">Deutsch</option><option value="en">English</option></select></label>
+        </div>
+        <div class="grid2">
+          <label>Absender im Abspann<input type="text" id="f-agent" value="Maklerbüro Beispiel"></label>
+          <label>Kontakt im Abspann<input type="text" id="f-kontakt" value="0341 000 000 · info@beispiel.de"></label>
+        </div>
+        <div class="row end"><button class="btn" data-go="1">Zurück</button><button class="btn primary" data-go="3">Storyboard schreiben lassen</button></div>
+      </section>
+
+      <!-- Schritt 3 -->
+      <section class="panel hidden-step" id="s3">
+        <div><h2>Storyboard</h2><p class="sub">Die Szenen folgen der Raumreihenfolge aus Schritt 1. Text, Reihenfolge und Kamerabewegung sind änderbar.</p></div>
+        <div class="row end"><p class="status" id="sb-status"></p>
+          <div class="row"><button class="btn" id="regen">Neu schreiben lassen</button><button class="btn" id="tpl">Vorlage nutzen</button></div></div>
+        <div id="scenes" style="display:flex;flex-direction:column;gap:10px"></div>
+        <div class="scene fixed"><div class="thumb" style="background:linear-gradient(135deg,#0b3f3c,#0f2733)"></div>
+          <div class="body"><h3>Abspann</h3><input type="text" id="f-endline" aria-label="Satz im Abspann" value="Jetzt Besichtigung vereinbaren"><p class="sub" id="end-prev"></p></div></div>
+        <div class="row end"><button class="btn" data-go="2">Zurück</button><div class="row"><button class="btn" id="speak" hidden>Sprechertext anhören</button><button class="btn primary" data-go="4">Video rendern</button></div></div>
+      </section>
+
+      <!-- Schritt 4 -->
+      <section class="panel hidden-step" id="s4">
+        <div><h2>Video</h2><p class="sub" id="s4-sub">Das Video wird in Echtzeit gerendert. Lass diesen Tab geöffnet und im Vordergrund.</p></div>
+        <canvas class="out" id="cv"></canvas>
+        <div id="rend-prog"><div class="bar"><i id="rbar"></i></div><p class="status" id="rstatus" style="margin-top:6px"></p></div>
+        <video class="out" id="vid" controls playsinline hidden></video>
+        <div class="row" id="res-actions" hidden>
+          <button class="btn primary" id="dl">Video herunterladen</button>
+          <button class="btn" id="rerender">Neu rendern</button>
+          <span class="status" id="dl-status"></span>
+        </div>
+        <p class="sub">Kamerafahrten entstehen aus den Fotos (Zoom und Schwenk). Echte KI-Bewegtbilder und Ton im Video sind der nächste Ausbauschritt.</p>
+        <div class="row end"><button class="btn" data-go="3">Storyboard anpassen</button></div>
+      </section>
+    </main>
+
+    <aside class="side panel">
+      <h3>Vorschau</h3>
+      <div class="stage fmt-169" id="live"></div>
+      <dl class="sum" id="sum"></dl>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ROOMS=['Außenansicht','Flur','Wohnzimmer','Küche','Esszimmer','Schlafzimmer','Kinderzimmer','Arbeitszimmer','Bad','Gäste-WC','Abstellraum','Balkon','Terrasse','Garten','Keller','Sonstiges'];
+  const GRAD={'Außenansicht':['#5d86a8','#cfe0ec'],'Wohnzimmer':['#b98f6a','#eadbc8'],'Küche':['#6f8f86','#d6e5df'],'Schlafzimmer':['#8b8aa8','#dddbe8'],'Bad':['#6aa0b2','#d5e9ef'],'Balkon':['#6e9b64','#dbe9cf'],'Terrasse':['#6e9b64','#dbe9cf'],'Garten':['#5f8f55','#d3e6c7']};
+  const STILE=[{id:'hell',t:'Hell und modern',d:'Sachlich, freundlich, klare Sätze'},{id:'hoch',t:'Hochwertig',d:'Ruhig, gewählt, langsame Fahrten'},{id:'fam',t:'Familiär',d:'Warm, persönlich, nah'}];
+  const FORMATE=[{id:'169',t:'Querformat 16:9',d:'Portale und Website',wh:[1280,720]},{id:'916',t:'Hochformat 9:16',d:'Reels und Stories',wh:[720,1280]},{id:'11',t:'Quadrat 1:1',d:'Feed',wh:[1080,1080]}];
+  const CAPS={
+    hell:{'Außenansicht':'{titel}, {ort}','Wohnzimmer':'Heller Wohnbereich mit viel Tageslicht','Küche':'Praktische Küche','Schlafzimmer':'Ruhiges Schlafzimmer','Bad':'Modernes Bad','Balkon':'Der Balkon zum Abschalten'},
+    hoch:{'Außenansicht':'{titel}. {ort}.','Wohnzimmer':'Großzügig wohnen auf {qm} m²','Küche':'Hochwertig ausgestattet','Schlafzimmer':'Rückzug mit Raum zum Durchatmen','Bad':'Bad mit Anspruch','Balkon':'Außenraum mit Aussicht'},
+    fam:{'Außenansicht':'Hier könnt ihr ankommen: {ort}','Wohnzimmer':'Platz für gemeinsame Abende','Küche':'Hier wird zusammen gekocht','Schlafzimmer':'Ein Zimmer zum Wohlfühlen','Bad':'Alles da für den Alltag','Balkon':'Frühstück draußen, jeden Tag'}
+  };
+  const MOTIONS=['Zoom hinein','Zoom heraus','Schwenk nach links','Schwenk nach rechts'];
+  const UNS=0; // Fach für noch nicht zugeordnete Fotos
+
+  const S={step:1,rooms:[],photos:[],floor:null,hint:'',highlights:[],stil:'hell',fmt:'169',scenes:[],uid:1,samples:true,dirty:true,render:0,video:null,ext:'webm'};
+  const CAP={sample:null,lim:null,dl:null,tts:null};
+
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const val=id=>$(id).value;
+  const fill=t=>t.replace('{titel}',val('f-titel')).replace('{ort}',val('f-ort')).replace('{qm}',val('f-qm'));
+  const grad=r=>GRAD[r]||['#8f98a3','#e1e5ea'];
+  const roomOf=p=>S.rooms.find(r=>r.id===p.roomId)||null;
+  const rtype=p=>{const r=roomOf(p);return r?r.type:'Sonstiges'};
+  const rname=p=>{const r=roomOf(p);return r?r.name:'Nicht zugeordnet'};
+  const bgCss=p=>p.src?"url('"+p.src+"')":'linear-gradient(135deg,'+grad(rtype(p))[0]+','+grad(rtype(p))[1]+')';
+  const stilT=()=>STILE.find(s=>s.id===S.stil).t;
+  const fmtO=()=>FORMATE.find(f=>f.id===S.fmt);
+  const qmTxt=q=>q?String(q).replace('.',',')+' m²':'';
+  function status(id,msg,err){const el=$(id); el.textContent=msg||''; el.classList.toggle('err',!!err);}
+  function errCopy(e){
+    const m={not_granted:'Du hast der Seite den Zugriff auf Claude nicht erlaubt. Du kannst alles von Hand zuordnen.',
+      rate_limited:'Gerade zu viele Anfragen. Versuch es in einer Minute noch einmal.',
+      image_rejected:'Ein Bild wurde abgelehnt. Nimm JPG, PNG oder WebP unter 20 MB.',
+      images_unavailable:'In dieser Ansicht können keine Bilder an Claude geschickt werden.',
+      invalid_json:'Die Antwort war unvollständig. Bitte noch einmal versuchen.',
+      refused:'Claude hat diese Anfrage abgelehnt.',session_expired:'Bitte melde dich neu an.',
+      sampling_disabled:'Claude ist für dieses Konto hier nicht verfügbar.',prompt_too_large:'Zu viele Daten auf einmal. Nimm weniger Fotos.'};
+    return m[e&&e.code]||'Das hat nicht geklappt. Bitte noch einmal versuchen.';
+  }
+
+  /* ---------- Fähigkeiten ---------- */
+  function initCaps(){
+    const c=window.claude;
+    if(!(c&&c.use)){capsReady();return}
+    c.use('sample').then(s=>{CAP.sample=s; return s?s.limits().then(l=>{CAP.lim=l}).catch(()=>{CAP.lim=null}):null}).catch(()=>{}).then(capsReady);
+    c.use('downloads').then(d=>{CAP.dl=d}).catch(()=>{});
+    c.use('tts').then(t=>{CAP.tts=t; $('speak').hidden=!t}).catch(()=>{});
+  }
+  const maxImgs=()=>CAP.lim&&CAP.lim.images?CAP.lim.images.maxCount:0;
+  const canSee=()=>!!(CAP.sample&&maxImgs());
+  function capsReady(){
+    if(!CAP.sample) $('notice').textContent='In dieser Ansicht ist Claude nicht verfügbar. Räume und Fotos ordnest du von Hand zu, das Storyboard kommt aus Vorlagen. Das Video wird trotzdem echt gerendert.';
+    if(!canSee()){ $('check').disabled=true; status('chk-status','Die Prüfung durch Claude geht nur in der Claude-Ansicht.'); }
+  }
+
+  /* ---------- Räume ---------- */
+  function newRoom(name,type,qm){return{id:S.uid++,name:name,type:type,qm:qm||null}}
+  function defaultRooms(){S.rooms=['Außenansicht','Flur','Wohnzimmer','Küche','Schlafzimmer','Bad','Balkon'].map(t=>newRoom(t,t))}
+  function seedPlaceholders(){S.photos=S.rooms.filter(r=>r.type!=='Flur').map(r=>({id:S.uid++,src:null,file:null,roomId:r.id,feats:[],guess:null}))}
+
+  function photoCell(p){
+    let h='<div class="pcell"><div class="thumb" style="background-image:'+bgCss(p)+'">'+(p.src?'':'<span class="ex">Platzhalter</span>')+
+      '<button class="rm" data-prm="'+p.id+'" aria-label="Foto entfernen">×</button></div>';
+    if(p.guess){const g=S.rooms.find(r=>r.id===p.guess); if(g) h+='<div class="warnbox">Sieht eher nach '+esc(g.name)+' aus<button data-move="'+p.id+'">Verschieben</button></div>';}
+    if(p.feats&&p.feats.length) h+='<div class="chips">'+p.feats.map(f=>'<span class="chip">'+esc(f)+'</span>').join('')+'</div>';
+    return h+'</div>';
+  }
+  function addTile(rid,label){return '<label class="add">'+label+'<input type="file" data-uproom="'+rid+'" accept="image/jpeg,image/png,image/webp" multiple hidden></label>'}
+  function renderRooms(){
+    const el=$('rooms'); let h='';
+    const uns=S.photos.filter(p=>p.roomId===UNS);
+    if(uns.length){
+      h+='<div class="room unsorted" data-rid="'+UNS+'"><div class="head"><h3>Noch nicht zugeordnet ('+uns.length+')</h3>'+
+        '<button class="btn small" data-sort="1"'+(canSee()?'':' disabled')+'>Von Claude einsortieren</button></div>'+
+        '<div class="rph">'+uns.map(photoCell).join('')+'</div><p class="sub">Diese Fotos kommen erst ins Video, wenn sie einem Raum zugeordnet sind.</p></div>';
+    }
+    S.rooms.forEach((r,i)=>{
+      const ph=S.photos.filter(p=>p.roomId===r.id);
+      h+='<div class="room'+(ph.length?'':' empty')+'" data-rid="'+r.id+'"><div class="head">'+
+        '<div class="row"><input class="rname" type="text" data-rname="'+r.id+'" value="'+esc(r.name)+'" aria-label="Raumname">'+
+        '<select data-rtype="'+r.id+'" aria-label="Raumtyp">'+ROOMS.map(t=>'<option'+(t===r.type?' selected':'')+'>'+t+'</option>').join('')+'</select>'+
+        (r.qm?'<span class="qm">'+qmTxt(r.qm)+'</span>':'')+'</div>'+
+        '<div class="row"><button class="x" data-rup="'+i+'" aria-label="Raum nach oben"'+(i===0?' disabled':'')+'>↑</button>'+
+        '<button class="x" data-rdn="'+i+'" aria-label="Raum nach unten"'+(i===S.rooms.length-1?' disabled':'')+'>↓</button>'+
+        '<button class="x" data-rdel="'+r.id+'" aria-label="Raum löschen">×</button></div></div>'+
+        '<div class="rph">'+ph.map(photoCell).join('')+addTile(r.id,'+ Fotos<br>'+esc(r.name))+'</div></div>';
+    });
+    el.innerHTML=h; coverage();
+  }
+  function coverage(){
+    const missing=S.rooms.filter(r=>!S.photos.some(p=>p.roomId===r.id&&p.file)&&!['Flur','Abstellraum','Keller','Gäste-WC'].includes(r.type));
+    const own=S.photos.filter(p=>p.file).length, el=$('cover');
+    if(!own){el.textContent='Noch keine eigenen Fotos';el.className='cover';return}
+    el.textContent=missing.length?'Fotos fehlen für: '+missing.map(r=>r.name).join(', '):'Alle Haupträume haben Fotos';
+    el.className='cover'+(missing.length?' warn':'');
+  }
+  const R=$('rooms');
+  R.addEventListener('change',e=>{const t=e.target; let a;
+    if((a=t.getAttribute('data-uproom'))!==null){addFiles(t.files,+a); t.value=''; return}
+    if((a=t.getAttribute('data-rtype'))!==null){const r=S.rooms.find(x=>x.id===+a); if(r){r.type=t.value;S.dirty=true;renderRooms();update()}}
+    if((a=t.getAttribute('data-rname'))!==null){const r=S.rooms.find(x=>x.id===+a); if(r){r.name=t.value.trim()||r.type;S.dirty=true;renderRooms();update()}}
+  });
+  R.addEventListener('click',e=>{const t=e.target.closest('button'); if(!t) return; let a;
+    if((a=t.getAttribute('data-rup'))!==null){a=+a; if(a>0){const x=S.rooms.splice(a,1)[0];S.rooms.splice(a-1,0,x);S.dirty=true;renderRooms();update()}}
+    else if((a=t.getAttribute('data-rdn'))!==null){a=+a; if(a<S.rooms.length-1){const x=S.rooms.splice(a,1)[0];S.rooms.splice(a+1,0,x);S.dirty=true;renderRooms();update()}}
+    else if((a=t.getAttribute('data-rdel'))!==null){a=+a; S.rooms=S.rooms.filter(r=>r.id!==a); S.photos.forEach(p=>{if(p.roomId===a){p.roomId=UNS;p.guess=null}}); S.photos=S.photos.filter(p=>p.file||p.roomId!==UNS); S.dirty=true;renderRooms();update()}
+    else if((a=t.getAttribute('data-prm'))!==null){a=+a; S.photos=S.photos.filter(p=>p.id!==a); S.dirty=true;renderRooms();update()}
+    else if((a=t.getAttribute('data-move'))!==null){const p=S.photos.find(x=>x.id===+a); if(p&&p.guess){p.roomId=p.guess;p.guess=null;S.dirty=true;renderRooms();update()}}
+    else if(t.hasAttribute('data-sort')) checkPhotos();
+  });
+  R.addEventListener('dragover',e=>{const c=e.target.closest('.room'); if(!c) return; e.preventDefault(); R.querySelectorAll('.room.over').forEach(x=>{if(x!==c)x.classList.remove('over')}); c.classList.add('over')});
+  R.addEventListener('dragleave',e=>{const c=e.target.closest('.room'); if(c&&!c.contains(e.relatedTarget)) c.classList.remove('over')});
+  R.addEventListener('drop',e=>{const c=e.target.closest('.room'); if(!c) return; e.preventDefault(); c.classList.remove('over'); addFiles(e.dataTransfer.files,+c.getAttribute('data-rid'))});
+  $('add-room').addEventListener('click',()=>{S.rooms.push(newRoom('Neuer Raum','Sonstiges'));renderRooms();const ins=R.querySelectorAll('.rname');const last=ins[ins.length-1]; if(last){last.focus();last.select()}});
+
+  /* ---------- Fotos ---------- */
+  const okType=f=>/^image\/(jpeg|png|webp)$/.test(f.type);
+  function addFiles(list,roomId){
+    const all=Array.from(list||[]), files=all.filter(okType);
+    if(files.length<all.length) status('chk-status','Einige Dateien wurden übersprungen. Erlaubt sind JPG, PNG und WebP.',true);
+    if(!files.length) return;
+    if(S.samples){S.photos=S.photos.filter(p=>p.file);S.samples=false}
+    files.forEach(f=>S.photos.push({id:S.uid++,src:URL.createObjectURL(f),file:f,roomId:roomId,feats:[],guess:null}));
+    S.dirty=true; renderRooms(); update();
+    if(roomId===UNS&&canSee()) status('chk-status',files.length+' Fotos liegen unter „Noch nicht zugeordnet“. Tipp auf „Von Claude einsortieren“.');
+  }
+  $('f-fotos').addEventListener('change',e=>{addFiles(e.target.files,UNS);e.target.value=''});
+  const drop=$('drop');
+  ['dragenter','dragover'].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.add('over')}));
+  ['dragleave','drop'].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.remove('over')}));
+  drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files,UNS));
+
+  /* ---------- Grundriss lesen ---------- */
+  $('f-gr').addEventListener('change',e=>{
+    const f=e.target.files[0]; e.target.value=''; if(!f) return;
+    if(!okType(f)){status('gr-status','Der Grundriss muss ein Bild sein (JPG, PNG oder WebP).',true);return}
+    S.floor={file:f,src:URL.createObjectURL(f)};
+    const pl=$('plan'); pl.textContent=''; pl.style.backgroundImage='url("'+S.floor.src+'")'; pl.style.backgroundColor='#fff';
+    $('reread').hidden=false; readFloor(); summary();
+  });
+  $('reread').addEventListener('click',readFloor);
+  function readFloor(){
+    if(!S.floor) return;
+    if(!canSee()){status('gr-status','Automatisches Lesen geht nur in der Claude-Ansicht. Leg die Räume unten von Hand an.');return}
+    const prompt='Das Bild ist der Grundriss einer Immobilie ('+val('f-art')+', '+val('f-qm')+' m², '+val('f-zi')+' Zimmer).\n'+
+      'Lies die Räume aus dem Plan. Antworte nur mit JSON:\n'+
+      '{"raeume":[{"name":"Schlafzimmer 1","typ":"Schlafzimmer","qm":12.4}],"rundgang":["Flur","Wohnzimmer","Küche"],"hinweis":"ein Satz zur Raumaufteilung"}\n'+
+      'Regeln: "typ" ist genau einer dieser Werte: '+ROOMS.filter(t=>t!=='Außenansicht').join(', ')+'. '+
+      '"name" ist eindeutig, so wie im Plan beschriftet, sonst der Typ (bei mehreren gleichen durchnummeriert). '+
+      '"qm" nur, wenn die Fläche im Plan lesbar ist, sonst null. "rundgang" enthält alle Raumnamen in einer sinnvollen Besichtigungsreihenfolge ab dem Eingang. '+
+      'Wenn das Bild kein Grundriss ist, antworte {"raeume":[],"rundgang":[],"hinweis":"kein Grundriss erkannt"}.';
+    status('gr-status','Claude liest den Grundriss. Das dauert meist 10 bis 30 Sekunden.'); $('reread').disabled=true;
+    CAP.sample.json(prompt,{images:[S.floor.file]}).then(applyFloor).catch(e=>status('gr-status',errCopy(e),true)).then(()=>{$('reread').disabled=false});
+  }
+  function applyFloor(r){
+    const raw=r&&Array.isArray(r.raeume)?r.raeume:[];
+    const seen=new Set(), list=[];
+    raw.forEach(x=>{let n=String(x&&x.name||'').trim().slice(0,40); const t=ROOMS.includes(x&&x.typ)&&x.typ!=='Außenansicht'?x.typ:'Sonstiges'; if(!n) n=t;
+      let k=n,i=2; while(seen.has(k)) k=n+' '+(i++); seen.add(k); const q=typeof x.qm==='number'&&x.qm>0&&x.qm<2000?Math.round(x.qm*10)/10:null; list.push({name:k,type:t,qm:q})});
+    if(!list.length){status('gr-status',(r&&r.hinweis?String(r.hinweis).slice(0,120)+'. ':'')+'Keine Räume erkannt. Leg die Räume von Hand an oder lade einen deutlicheren Plan hoch.',true);return}
+    const order=r&&Array.isArray(r.rundgang)?r.rundgang.map(String):[];
+    list.sort((a,b)=>{const ia=order.indexOf(a.name),ib=order.indexOf(b.name);return (ia<0?99:ia)-(ib<0?99:ib)});
+    const old=S.rooms, ext=old.find(x=>x.type==='Außenansicht')||newRoom('Außenansicht','Außenansicht');
+    const rooms=[ext].concat(list.map(x=>newRoom(x.name,x.type,x.qm)));
+    // vorhandene eigene Fotos in die neuen Räume übernehmen
+    S.photos.filter(p=>p.file&&p.roomId!==UNS).forEach(p=>{const o=old.find(x=>x.id===p.roomId); if(!o){p.roomId=UNS;return}
+      const m=rooms.find(x=>x.name===o.name)||rooms.find(x=>x.type===o.type); p.roomId=m?m.id:UNS});
+    S.rooms=rooms; if(S.samples) seedPlaceholders(); else S.photos=S.photos.filter(p=>p.file);
+    S.hint=r&&r.hinweis?String(r.hinweis).slice(0,240):''; const gh=$('gr-hint'); gh.textContent=S.hint; gh.hidden=!S.hint;
+    const sum=list.reduce((a,x)=>a+(x.qm||0),0);
+    status('gr-status',list.length+' Räume erkannt'+(sum?', zusammen ca. '+qmTxt(Math.round(sum))+' laut Plan':'')+'. Prüf die Liste unten: umbenennen, verschieben oder löschen geht direkt.');
+    S.dirty=true; renderRooms(); update();
+  }
+
+  /* ---------- Fotos prüfen und einsortieren ---------- */
+  $('check').addEventListener('click',checkPhotos);
+  function checkPhotos(){
+    if(!canSee()) return;
+    const own=S.photos.filter(p=>p.file);
+    if(!own.length){status('chk-status','Lade zuerst eigene Fotos hoch.',true);return}
+    if(!S.rooms.length){status('chk-status','Leg zuerst mindestens einen Raum an.',true);return}
+    const uns=own.filter(p=>p.roomId===UNS), rest=own.filter(p=>p.roomId!==UNS);
+    const use=uns.concat(rest).slice(0,maxImgs());
+    const names=S.rooms.map(r=>r.name);
+    const lines=use.map((p,i)=>'Bild '+(i+1)+': '+(p.roomId===UNS?'noch nicht zugeordnet':'zugeordnet zu "'+rname(p)+'"')).join('\n');
+    const prompt='Du prüfst die Fotos für ein Immobilien-Exposé ('+val('f-art')+', '+val('f-ort')+').\n'+
+      'Räume laut Makler: '+S.rooms.map(r=>'"'+r.name+'" ('+r.type+')').join(', ')+'.\n'+
+      'Du bekommst '+use.length+' Fotos, in dieser Reihenfolge:\n'+lines+'\n\n'+
+      'Antworte nur mit JSON: {"fotos":[{"bild":1,"raum":"Name aus der Raumliste","passt":true,"merkmale":["Dielenboden"]}],"highlights":["Merkmal"]}\n'+
+      'Regeln: "raum" ist genau einer der Raumnamen oben, der Raum, den das Foto am wahrscheinlichsten zeigt. Bei mehreren Räumen gleichen Typs wähle den bisher zugeordneten, wenn er passt. '+
+      '"passt" sagt, ob die bisherige Zuordnung stimmt (bei nicht zugeordnet: false). "merkmale" sind 1 bis 3 kurze, im Foto sichtbare Merkmale auf Deutsch. '+
+      '"highlights" sind bis zu 4 sichtbare Verkaufsargumente. Erfinde nichts.';
+    $('check').disabled=true; R.querySelectorAll('[data-sort]').forEach(b=>b.disabled=true);
+    status('chk-status','Claude sieht sich '+use.length+' Fotos an. Das dauert meist 15 bis 45 Sekunden.');
+    CAP.sample.json(prompt,{images:use.map(p=>p.file)}).then(r=>{
+      let sorted=0,warn=0;
+      (r&&Array.isArray(r.fotos)?r.fotos:[]).forEach(f=>{
+        const p=use[(+f.bild||0)-1]; if(!p) return;
+        p.feats=Array.isArray(f.merkmale)?f.merkmale.slice(0,3).map(x=>String(x).slice(0,40)):p.feats;
+        const tgt=S.rooms.find(x=>x.name===f.raum);
+        if(p.roomId===UNS){ if(tgt){p.roomId=tgt.id;sorted++} }
+        else if(f.passt===false&&tgt&&tgt.id!==p.roomId){p.guess=tgt.id;warn++}
+        else p.guess=null;
+      });
+      S.highlights=Array.isArray(r&&r.highlights)?r.highlights.slice(0,4).map(x=>String(x).slice(0,60)):[];
+      const left=own.length-use.length;
+      status('chk-status',(sorted?sorted+' Fotos einsortiert. ':'')+(warn?warn+' Fotos sehen nach einem anderen Raum aus, siehe Hinweise. ':'Keine falschen Zuordnungen gefunden. ')+(left?left+' Fotos lagen über dem Limit pro Anfrage und wurden nicht geprüft.':''));
+      S.dirty=true; renderRooms(); renderHL(); update();
+    }).catch(e=>status('chk-status',errCopy(e),true)).then(()=>{$('check').disabled=false; R.querySelectorAll('[data-sort]').forEach(b=>b.disabled=false)});
+  }
+  function renderHL(){
+    const out=$('ana-out'); if(!S.highlights.length){out.hidden=true;return}
+    out.innerHTML='<div class="row"><span class="sub">Sichtbar auf den Fotos:</span><div class="chips">'+S.highlights.map(x=>'<span class="chip">'+esc(x)+'</span>').join('')+'</div><button class="btn small" id="take-hl">In Highlights übernehmen</button></div>';
+    out.hidden=false;
+    $('take-hl').addEventListener('click',e=>{
+      const cur=val('f-hl').split(',').map(s=>s.trim()).filter(Boolean);
+      S.highlights.forEach(x=>{if(!cur.some(c=>c.toLowerCase()===x.toLowerCase())) cur.push(x)});
+      $('f-hl').value=cur.join(', '); S.dirty=true; e.target.disabled=true; e.target.textContent='Übernommen';
+    });
+  }
+
+  /* ---------- Stil ---------- */
+  function renderChoices(){
+    $('c-stil').innerHTML=STILE.map(s=>'<label class="choice"><input type="radio" name="stil" value="'+s.id+'"'+(S.stil===s.id?' checked':'')+'><span>'+s.t+'<small>'+s.d+'</small></span></label>').join('');
+    $('c-fmt').innerHTML=FORMATE.map(s=>'<label class="choice"><input type="radio" name="fmt" value="'+s.id+'"'+(S.fmt===s.id?' checked':'')+'><span>'+s.t+'<small>'+s.d+'</small></span></label>').join('');
+  }
+  document.addEventListener('change',e=>{
+    if(e.target.name==='stil'){S.stil=e.target.value;S.dirty=true;update()}
+    if(e.target.name==='fmt'){S.fmt=e.target.value;update()}
+    if(e.target.id&&/^f-(titel|ort|qm|zi|art|hl|lang|len)$/.test(e.target.id)) S.dirty=true;
+  });
+  document.addEventListener('input',e=>{if(e.target.id&&/^f-/.test(e.target.id)) update()});
+
+  /* ---------- Storyboard ---------- */
+  function videoPhotos(){const out=[]; S.rooms.forEach(r=>S.photos.filter(p=>p.roomId===r.id).forEach(p=>out.push(p))); return out}
+  function capFor(p){const r=roomOf(p); const c=CAPS[S.stil][r.type]; return c?fill(c):(r.name+(r.qm?' · '+qmTxt(r.qm):''))}
+  function templateScenes(){
+    const seen={};
+    S.scenes=videoPhotos().map((p,i)=>{const k=p.roomId; seen[k]=(seen[k]||0)+1; const c=capFor(p);
+      return{pid:p.id,on:seen[k]<=2,cap:c,voice:c+'.',mo:MOTIONS[i%MOTIONS.length]}});
+    $('f-endline').value=val('f-lang')==='en'?'Book a viewing today':'Jetzt Besichtigung vereinbaren';
+  }
+  function makeStoryboard(useAI){
+    S.dirty=false;
+    const vp=videoPhotos();
+    if(!vp.length){S.scenes=[];renderScenes();status('sb-status','Noch keine Fotos in Räumen. Ordne in Schritt 1 Fotos zu.',true);return}
+    if(!useAI||!CAP.sample){templateScenes();renderScenes();status('sb-status','Vorlage verwendet.');return}
+    let n=0; const plan=S.rooms.map(r=>({raum:r.name,typ:r.type,qm:r.qm,bilder:S.photos.filter(p=>p.roomId===r.id).map(p=>({bild:++n,merkmale:p.feats||[]}))})).filter(x=>x.bilder.length);
+    const lang=val('f-lang')==='en'?'Englisch':'Deutsch';
+    const prompt='Schreibe das Storyboard für ein '+val('f-len')+' Sekunden langes Immobilienvideo, Format '+fmtO().t+'.\n'+
+      'Ton: '+stilT()+' ('+STILE.find(s=>s.id===S.stil).d+'). Sprache aller Texte: '+lang+'.\n'+
+      'Objekt: '+val('f-titel')+'; '+val('f-art')+', '+val('f-qm')+' m², '+val('f-zi')+' Zimmer, '+val('f-ort')+', Preis '+val('f-preis')+'.\n'+
+      'Highlights vom Makler: '+val('f-hl')+'.\n'+(S.hint?'Raumaufteilung laut Grundriss: '+S.hint+'\n':'')+
+      'Räume in Rundgang-Reihenfolge, mit Fotos: '+JSON.stringify(plan)+'\n\n'+
+      'Antworte nur mit JSON: {"szenen":[{"bild":1,"text":"Einblendung, höchstens 45 Zeichen","sprecher":"ein kurzer Satz Sprechertext","bewegung":"Zoom hinein"}],"abspann":"kurzer Satz mit Handlungsaufforderung"}\n'+
+      'Regeln: Reihenfolge der Räume beibehalten; jedes Bild höchstens einmal; wähle so viele Bilder, dass jede Szene etwa 3 bis 5 Sekunden hat; '+
+      'nutze Flächenangaben, wo sie dem Text helfen; "bewegung" ist einer von: '+MOTIONS.join(', ')+'. '+
+      'Nenne nur Ausstattung, die in den Merkmalen oder Highlights steht. Keine Superlative, die nicht belegbar sind.';
+    status('sb-status','Claude schreibt das Storyboard. Das dauert meist 10 bis 40 Sekunden.'); $('regen').disabled=true; $('scenes').innerHTML='';
+    CAP.sample.json(prompt,{cache:false}).then(r=>{
+      const used=new Set(), out=[];
+      (r&&Array.isArray(r.szenen)?r.szenen:[]).forEach((s,i)=>{
+        const p=vp[(+s.bild||0)-1]; if(!p||used.has(p.id)) return; used.add(p.id);
+        out.push({pid:p.id,on:true,cap:String(s.text||rname(p)).slice(0,60),voice:String(s.sprecher||'').slice(0,220),mo:MOTIONS.includes(s.bewegung)?s.bewegung:MOTIONS[i%MOTIONS.length]});
+      });
+      const ord=p=>S.rooms.findIndex(x=>x.id===p.roomId);
+      out.sort((a,b)=>ord(S.photos.find(x=>x.id===a.pid))-ord(S.photos.find(x=>x.id===b.pid)));
+      vp.forEach(p=>{if(!used.has(p.id)) out.push({pid:p.id,on:false,cap:capFor(p),voice:'',mo:MOTIONS[0]})});
+      if(!out.some(s=>s.on)){templateScenes();status('sb-status','Die Antwort war nicht verwertbar. Vorlage verwendet.',true)}
+      else{S.scenes=out; if(r.abspann) $('f-endline').value=String(r.abspann).slice(0,60); status('sb-status','Von Claude geschrieben. Prüf die Texte, bevor du renderst.')}
+    }).catch(e=>{templateScenes();status('sb-status',errCopy(e)+' Vorlage verwendet.',true)}).then(()=>{$('regen').disabled=false;renderScenes();update()});
+  }
+  function renderScenes(){
+    const el=$('scenes'); el.innerHTML='';
+    S.scenes.forEach((sc,i)=>{
+      const p=S.photos.find(x=>x.id===sc.pid); if(!p) return;
+      const d=document.createElement('div'); d.className='scene'+(sc.on?'':' off');
+      d.innerHTML='<div class="thumb" style="background-image:'+bgCss(p)+'"></div><div class="body">'+
+        '<div class="meta"><span class="pill">'+esc(rname(p))+'</span><select data-mo="'+i+'" aria-label="Kamerabewegung">'+MOTIONS.map(m=>'<option'+(m===sc.mo?' selected':'')+'>'+m+'</option>').join('')+'</select></div>'+
+        '<input type="text" data-cap="'+i+'" value="'+esc(sc.cap)+'" aria-label="Einblendung" maxlength="60">'+
+        '<textarea data-voice="'+i+'" aria-label="Sprechertext" placeholder="Sprechertext">'+esc(sc.voice)+'</textarea>'+
+        '<div class="row"><button class="x" data-up="'+i+'" aria-label="Nach oben"'+(i===0?' disabled':'')+'>↑</button><button class="x" data-dn="'+i+'" aria-label="Nach unten"'+(i===S.scenes.length-1?' disabled':'')+'>↓</button>'+
+        '<label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" data-on="'+i+'"'+(sc.on?' checked':'')+'>Im Video</label></div></div>';
+      el.appendChild(d);
+    });
+    endPrev();
+  }
+  function endPrev(){$('end-prev').textContent=val('f-agent')+' · '+val('f-kontakt')+' · '+val('f-preis')}
+  $('scenes').addEventListener('input',e=>{const t=e.target; let a;
+    if((a=t.getAttribute('data-cap'))!==null){S.scenes[+a].cap=t.value;update()}
+    if((a=t.getAttribute('data-voice'))!==null){S.scenes[+a].voice=t.value}});
+  $('scenes').addEventListener('change',e=>{const t=e.target; let a;
+    if((a=t.getAttribute('data-mo'))!==null) S.scenes[+a].mo=t.value;
+    if((a=t.getAttribute('data-on'))!==null){S.scenes[+a].on=t.checked;renderScenes();update()}});
+  $('scenes').addEventListener('click',e=>{const t=e.target; let a;
+    if((a=t.getAttribute('data-up'))!==null){a=+a;if(a>0){const x=S.scenes.splice(a,1)[0];S.scenes.splice(a-1,0,x);renderScenes();update()}}
+    if((a=t.getAttribute('data-dn'))!==null){a=+a;if(a<S.scenes.length-1){const y=S.scenes.splice(a,1)[0];S.scenes.splice(a+1,0,y);renderScenes();update()}}});
+  $('regen').addEventListener('click',()=>makeStoryboard(true));
+  $('tpl').addEventListener('click',()=>{S.dirty=false;templateScenes();renderScenes();update();status('sb-status','Vorlage verwendet.')});
+  $('speak').addEventListener('click',()=>{
+    if(!CAP.tts) return;
+    const txt=active().map(x=>x.sc.voice||x.sc.cap).concat([val('f-endline')]).join(' ').slice(0,2000);
+    CAP.tts.speak(txt,{language:val('f-lang')}).catch(()=>{});
+  });
+  function active(){return S.scenes.filter(s=>s.on).map(s=>({sc:s,p:S.photos.find(x=>x.id===s.pid)})).filter(x=>x.p&&x.p.roomId!==UNS&&roomOf(x.p))}
+
+  /* ---------- Vorschau rechts ---------- */
+  function summary(){
+    const a=active(), own=S.photos.filter(p=>p.file).length;
+    const rows=[['Objekt',val('f-titel')],['Lage',val('f-ort')],['Fläche',val('f-qm')+' m² · '+val('f-zi')+' Zi.'],['Grundriss',S.floor?'vorhanden':'fehlt'],
+      ['Räume',S.rooms.length+' angelegt'],['Fotos',own?own+' eigene':'nur Platzhalter'],['Look',stilT()],['Format',fmtO().t],['Länge',val('f-len')+' s'+(a.length?' · '+a.length+' Szenen + Abspann':'')]];
+    $('sum').innerHTML=rows.map(r=>'<dt>'+r[0]+'</dt><dd>'+esc(r[1])+'</dd>').join('');
+  }
+  function update(){
+    const live=$('live'); live.className='stage fmt-'+S.fmt;
+    const a=active(); const p=a.length?a[0].p:videoPhotos()[0];
+    const cap=a.length?a[0].sc.cap:(p?capFor(p):'');
+    live.innerHTML=p?'<div class="shot" style="background-image:'+bgCss(p)+'"></div><div class="cap">'+esc(cap)+'</div>':'';
+    summary(); if(S.step===3) endPrev();
+  }
+
+  /* ---------- Rendern ---------- */
+  function loadImg(src){return new Promise(res=>{const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(null); im.src=src})}
+  function ease(u){u=u<0?0:u>1?1:u;return u*u*(3-2*u)}
+  function wrap(ctx,text,maxW){const words=String(text).split(/\s+/).filter(Boolean),lines=[];let l='';
+    words.forEach(w=>{const t=l?l+' '+w:w; if(ctx.measureText(t).width>maxW&&l){lines.push(l);l=w}else l=t}); if(l) lines.push(l); return lines.slice(0,3)}
+  function drawShot(ctx,W,H,item,img,u){
+    const e=ease(u); let z0=1,z1=1.12,x0=0,x1=0;
+    if(item.sc.mo==='Zoom heraus'){z0=1.12;z1=1}
+    else if(item.sc.mo==='Schwenk nach links'){z0=z1=1.14;x0=.035;x1=-.035}
+    else if(item.sc.mo==='Schwenk nach rechts'){z0=z1=1.14;x0=-.035;x1=.035}
+    const z=z0+(z1-z0)*e, dx=(x0+(x1-x0)*e)*W;
+    if(img){const s=Math.max(W/img.width,H/img.height)*z,w=img.width*s,h=img.height*s; ctx.drawImage(img,(W-w)/2+dx,(H-h)/2,w,h)}
+    else{const g=grad(rtype(item.p)),gr=ctx.createLinearGradient(0,0,W,H); gr.addColorStop(0,g[0]); gr.addColorStop(1,g[1]); ctx.fillStyle=gr; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='rgba(255,255,255,.85)'; ctx.font='500 '+Math.round(Math.min(W,H)*.06)+'px "Space Grotesk",Arial,sans-serif'; ctx.textAlign='center'; ctx.fillText(rname(item.p)+' (Platzhalter)',W/2,H*.42,W*.9); ctx.textAlign='left'}
+    const fs=Math.round(Math.min(W,H)*.052), pad=Math.round(W*.06);
+    const og=ctx.createLinearGradient(0,H*.55,0,H); og.addColorStop(0,'rgba(0,0,0,0)'); og.addColorStop(1,'rgba(0,0,0,.65)'); ctx.fillStyle=og; ctx.fillRect(0,H*.55,W,H*.45);
+    ctx.font='700 '+fs+'px "Space Grotesk",Arial,sans-serif'; ctx.fillStyle='#fff'; ctx.textBaseline='alphabetic';
+    const lines=wrap(ctx,item.sc.cap,W-pad*2);
+    ctx.globalAlpha=Math.min(1,u*4); lines.forEach((ln,i)=>ctx.fillText(ln,pad,H-pad-(lines.length-1-i)*fs*1.2)); ctx.globalAlpha=1;
+  }
+  function drawEnd(ctx,W,H,u){
+    const gr=ctx.createLinearGradient(0,0,W,H); gr.addColorStop(0,'#0b3f3c'); gr.addColorStop(1,'#0f2733'); ctx.fillStyle=gr; ctx.fillRect(0,0,W,H);
+    const m=Math.min(W,H), cx=W/2; ctx.textAlign='center'; ctx.fillStyle='#fff'; ctx.globalAlpha=Math.min(1,u*3);
+    ctx.font='500 '+Math.round(m*.035)+'px Inter,Arial,sans-serif'; ctx.fillText(val('f-titel'),cx,H*.36,W*.9);
+    ctx.font='700 '+Math.round(m*.07)+'px "Space Grotesk",Arial,sans-serif'; ctx.fillText(val('f-endline'),cx,H*.48,W*.9);
+    ctx.font='700 '+Math.round(m*.045)+'px "Space Grotesk",Arial,sans-serif'; ctx.fillText(val('f-preis'),cx,H*.58,W*.9);
+    ctx.font='500 '+Math.round(m*.034)+'px Inter,Arial,sans-serif'; ctx.fillText(val('f-agent'),cx,H*.7,W*.9); ctx.fillText(val('f-kontakt'),cx,H*.76,W*.9);
+    ctx.globalAlpha=1; ctx.textAlign='left';
+  }
+  function pickMime(){
+    const c=['video/mp4;codecs=avc1.42E01E','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
+    for(const m of c){try{if(MediaRecorder.isTypeSupported(m)) return m}catch(e){}} return '';
+  }
+  async function render(){
+    const token=++S.render;
+    const items=active(); const cv=$('cv'), vid=$('vid');
+    vid.hidden=true; $('res-actions').hidden=true; cv.hidden=false; $('rend-prog').hidden=false; status('dl-status',''); $('rbar').style.width='0';
+    if(!items.length){status('rstatus','Keine Szene ausgewählt. Ordne Fotos Räumen zu und schalte im Storyboard mindestens eine Szene an.',true);return}
+    if(!window.MediaRecorder||!cv.captureStream){status('rstatus','Dieser Browser kann kein Video aufnehmen. Nimm Chrome, Edge oder Firefox.',true);return}
+    const [W,H]=fmtO().wh; cv.width=W; cv.height=H; cv.className='out'+(S.fmt==='916'?' v916':S.fmt==='11'?' v11':''); vid.className=cv.className;
+    status('rstatus','Bilder werden geladen …');
+    try{await document.fonts.ready}catch(e){}
+    const imgs=await Promise.all(items.map(x=>x.p.src?loadImg(x.p.src):Promise.resolve(null)));
+    if(token!==S.render) return;
+    const ctx=cv.getContext('2d'); const total=+val('f-len'), n=items.length+1, per=total/n, fade=Math.min(.6,per*.25);
+    const mime=pickMime(); S.ext=mime.indexOf('mp4')>=0?'mp4':'webm';
+    let rec; try{rec=new MediaRecorder(cv.captureStream(30),mime?{mimeType:mime,videoBitsPerSecond:6000000}:{videoBitsPerSecond:6000000})}
+    catch(e){status('rstatus','Die Aufnahme ließ sich nicht starten. Versuch es in einem anderen Browser.',true);return}
+    const chunks=[]; rec.ondataavailable=e=>{if(e.data&&e.data.size) chunks.push(e.data)};
+    rec.onstop=()=>{
+      if(token!==S.render) return;
+      const blob=new Blob(chunks,{type:(mime||'video/webm').split(';')[0]}); S.video=blob;
+      vid.src=URL.createObjectURL(blob); vid.hidden=false; cv.hidden=true; $('rend-prog').hidden=true; $('res-actions').hidden=false;
+      $('s4-sub').textContent='Fertig: '+total+' Sekunden, '+W+'×'+H+', '+S.ext.toUpperCase()+', '+(blob.size/1048576).toFixed(1)+' MB.';
+      $('dl').hidden=!CAP.dl; if(!CAP.dl) status('dl-status','Herunterladen geht nur in der Claude-Ansicht. Du kannst das Video oben abspielen.');
+    };
+    const draw=t=>{
+      t=Math.max(0,t); const idx=Math.max(0,Math.min(n-1,Math.floor(t/per))), loc=t-idx*per;
+      const one=(k,u)=>{if(k>=items.length) drawEnd(ctx,W,H,u); else drawShot(ctx,W,H,items[k],imgs[k],u)};
+      ctx.globalAlpha=1; one(idx,loc/per);
+      if(idx>0&&loc<fade){ctx.globalAlpha=1-loc/fade; one(idx-1,1); ctx.globalAlpha=1}
+      if(t<.4){ctx.fillStyle='rgba(0,0,0,'+(1-t/.4)+')';ctx.fillRect(0,0,W,H)}
+    };
+    draw(0); rec.start(500); const t0=performance.now();
+    $('s4-sub').textContent='Das Video wird in Echtzeit gerendert. Lass diesen Tab geöffnet und im Vordergrund.';
+    const loop=now=>{
+      if(token!==S.render){try{rec.stop()}catch(e){} return}
+      const t=Math.max(0,(now-t0)/1000);
+      if(t>=total){draw(total-.001); $('rbar').style.width='100%'; status('rstatus','Video wird fertiggestellt …'); setTimeout(()=>{try{rec.stop()}catch(e){}},300); return}
+      draw(t); $('rbar').style.width=(t/total*100)+'%'; status('rstatus','Szene '+Math.min(n,Math.floor(t/per)+1)+' von '+n+' · '+Math.ceil(total-t)+' s verbleibend');
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+  $('rerender').addEventListener('click',render);
+  $('dl').addEventListener('click',()=>{
+    if(!CAP.dl||!S.video) return;
+    const name=(val('f-titel')||'objektvideo').replace(/[^\wäöüÄÖÜß -]+/g,'').trim().slice(0,60)||'objektvideo';
+    status('dl-status','');
+    CAP.dl.save({filename:name+'.'+S.ext,data:S.video}).then(()=>status('dl-status','Gespeichert.')).catch(e=>{
+      if(e&&e.code==='declined') return; status('dl-status','Herunterladen hat nicht geklappt. Du kannst das Video oben abspielen.',true)});
+  });
+
+  /* ---------- Navigation ---------- */
+  function go(n){
+    if(n!==4) S.render++;
+    S.step=n;
+    [1,2,3,4].forEach(i=>$('s'+i).classList.toggle('hidden-step',i!==n));
+    document.querySelectorAll('#steps button').forEach(b=>{const k=+b.getAttribute('data-go');
+      if(k===n) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current'); b.classList.toggle('done',k<n)});
+    if(n===3){ if(!S.scenes.length||S.dirty) makeStoryboard(true); else renderScenes(); }
+    if(n===4){ if(!S.scenes.length||S.dirty){S.dirty=false;templateScenes()} render(); }
+    update();
+    try{window.scrollTo({top:0})}catch(e){}
+  }
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-go]'); if(b) go(+b.getAttribute('data-go'))});
+
+  defaultRooms(); seedPlaceholders(); renderRooms(); renderChoices(); go(1); initCaps();
+})();
+</script>
+
+</body>
+</html>

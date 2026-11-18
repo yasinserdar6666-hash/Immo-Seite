@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}body{margin:0}</style>
+</head>
+<body>
+<title>Wohnungs-Rundgang 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: ein großes Fenster, das zwischen Puppenhaus und Ich-Perspektive wechselt; Bedienelemente als Overlay. */
+:root{
+  --bg:#f2f4f6; --surface:#ffffff; --surface-2:#e9edf1; --ink:#13202c; --muted:#546372; --line:#d3dbe2;
+  --accent:#0b6e69; --accent-ink:#ffffff; --accent-soft:#d9efed; --warn:#8a5200; --warn-soft:#fbeed8;
+  --font-d:'Space Grotesk','Helvetica Neue',Arial,sans-serif; --font-b:'Inter','Helvetica Neue',Arial,sans-serif; --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#0f161d;--surface:#17212b;--surface-2:#1f2b37;--ink:#e8eef3;--muted:#9aa9b7;--line:#2b3947;
+    --accent:#3fb8b0;--accent-ink:#06201e;--accent-soft:#143a38;--warn:#f0b35a;--warn-soft:#3a2b12;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#0f161d;--surface:#17212b;--surface-2:#1f2b37;--ink:#e8eef3;--muted:#9aa9b7;--line:#2b3947;
+  --accent:#3fb8b0;--accent-ink:#06201e;--accent-soft:#143a38;--warn:#f0b35a;--warn-soft:#3a2b12;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+h1,h3{font-family:var(--font-d);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:22px} h3{font-size:14px}
+p{margin:0}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between}
+.tag{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.notice{background:var(--warn-soft);color:var(--warn);border-radius:var(--r);padding:10px 14px;font-size:13px}
+.sv{position:relative;border-radius:var(--r);overflow:hidden;background:#e3e7eb;aspect-ratio:3/4;max-width:100%;user-select:none;-webkit-user-select:none}
+@media (min-width:640px){.sv{aspect-ratio:16/9}}
+.sv canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.sv canvas.drag{cursor:grabbing}
+.sv canvas.hot{cursor:pointer}
+.top{position:absolute;left:12px;top:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
+.where{background:rgba(12,17,22,.72);color:#fff;border-radius:8px;padding:8px 12px;font-size:13px;pointer-events:auto;max-width:60%}
+.where b{font-family:var(--font-d);font-size:17px;display:block}
+.where span{opacity:.82}
+.btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
+.btn{font:inherit;font-size:13px;font-weight:500;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 12px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.btn:focus-visible,.lbl:focus-visible,.go:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lbl,.go{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;white-space:nowrap;border:0;font:600 12px var(--font-b);border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.28)}
+.lbl{color:#13202c;background:rgba(255,255,255,.92);padding:4px 11px}
+.lbl small{font-weight:400;color:#546372;margin-left:4px}
+.lbl:hover{background:#0b6e69;color:#fff}.lbl:hover small{color:#d9efed}
+.go{color:#13202c;background:rgba(255,255,255,.92);padding:4px 11px}
+.go:hover{background:#0b6e69;color:#fff}
+.map{position:absolute;right:12px;bottom:12px;background:rgba(255,255,255,.92);border-radius:8px;padding:6px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.map canvas{display:block;width:150px;height:auto;cursor:pointer}
+@media (min-width:640px){.map canvas{width:190px}}
+.hint{position:absolute;left:12px;bottom:12px;color:#fff;font-size:12px;background:rgba(12,17,22,.62);border-radius:8px;padding:6px 10px;max-width:calc(100% - 24px)}
+.inside .hint{max-width:calc(100% - 230px)}
+@media (max-width:639px){.inside .hint{display:none}}
+.cols{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:860px){.cols{grid-template-columns:1fr 1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card ol,.card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.err{padding:20px;color:#13202c}
+.sub{color:var(--muted);font-size:13px}
+.status{font-size:13px;color:var(--muted);min-height:1.2em}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn.small{font-size:12px;padding:5px 10px}
+.plist{display:flex;flex-direction:column;gap:8px}
+.pr{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--bg)}
+.pr .head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.pr .ok{color:var(--accent)}
+.pr label.btn{display:inline-block}
+.pr .rot{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.pr .rot input{flex:1;min-width:0;accent-color:var(--accent)}
+.card video{width:100%;border-radius:8px;background:#0c1116}
+pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-size:12px;overflow-x:auto;color:var(--ink)}
+.recov{position:absolute;left:50%;top:12px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;background:rgba(163,39,31,.92);color:#fff;border-radius:999px;padding:6px 8px 6px 14px;font-size:13px;z-index:5}
+.recov::before{content:"";width:9px;height:9px;border-radius:50%;background:#fff;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.recov::before{animation:none}}
+.sv.recording .top,.sv.recording .hint,.sv.recording .map,.sv.recording .lbl,.sv.recording .go{visibility:hidden}
+.blocker{position:absolute;inset:0;z-index:4}
+.recov[hidden],.blocker[hidden],.map[hidden]{display:none}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Wohnungs-Rundgang 3D</h1>
+    <span class="tag">Beispiel · Puppenhaus und Ich-Perspektive</span>
+  </header>
+  <p class="notice">Beispielwohnung als vereinfachtes 3D-Modell. Im echten Produkt käme das Puppenhaus aus dem Grundriss und an jedem Standpunkt innen stünde ein 360°-Foto.</p>
+
+  <div class="sv" id="sv">
+    <div class="top">
+      <div class="where" id="where"><b>Puppenhaus</b><span>Raum antippen, um hineinzugehen</span></div>
+      <div class="btns">
+        <button class="btn" id="low" aria-pressed="false">Wände niedrig</button>
+        <button class="btn primary" id="out" hidden>Zum Puppenhaus</button>
+        <button class="btn" id="fs">Vollbild</button>
+      </div>
+    </div>
+    <p class="hint" id="hint">Ziehen zum Drehen · Zoomen mit Mausrad oder zwei Fingern · Raum antippen zum Hineingehen</p>
+    <div class="map" id="mapbox" hidden><canvas id="map" width="380" height="300" aria-label="Grundriss mit Standort"></canvas></div>
+    <div class="blocker" id="blocker" hidden></div>
+    <div class="recov" id="recov" hidden><span id="rec-msg">Video wird aufgenommen</span><button class="btn small" id="rec-x">Abbrechen</button></div>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h3>360°-Fotos pro Raum</h3>
+      <p class="sub">Pro Raum ein 360°-Foto im Format 2:1, aufgenommen in der Raummitte auf Augenhöhe. Ohne Foto zeigt die Innenansicht das 3D-Modell. Mit dem Regler drehst du das Foto, bis die Pfeile zu den Türen passen.</p>
+      <div class="plist" id="panos"></div>
+    </div>
+    <div class="card">
+      <h3>Rundgang als Video</h3>
+      <p class="sub">Eine automatische Kamerafahrt: Puppenhaus, durch alle Räume, zurück nach oben. Etwa eine Minute, 1280×720. Hochgeladene 360°-Fotos werden verwendet.</p>
+      <div class="row"><button class="btn primary" id="rec">Video erstellen</button></div>
+      <p class="sub">Im Produkt kostet das Zusatz-Credits, z. B. 5 Credits (Beispielpreis). In der Demo ist es kostenlos.</p>
+      <p class="status" id="rec-st"></p>
+      <video id="vid" controls playsinline hidden></video>
+      <div class="row" id="vid-act" hidden><button class="btn" id="dl">Video herunterladen</button><span class="sub" id="dl-st"></span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Auf der eigenen Website einbinden</h3>
+    <p class="sub">Jeder Rundgang bekommt eine eigene Adresse. Der Makler kopiert diesen Schnipsel in seine Objektseite, in WordPress etwa in einen „Individuelles HTML“-Block. Die Adresse unten ist ein Muster.</p>
+    <pre id="snip">&lt;iframe src="https://rundgang.beispiel.de/t/3zi-plagwitz-7f2a"
+        width="100%" height="560" style="border:0;border-radius:8px"
+        allow="fullscreen; gyroscope; accelerometer"
+        loading="lazy" title="3D-Rundgang"&gt;&lt;/iframe&gt;</pre>
+    <div class="row"><button class="btn" id="copy">Schnipsel kopieren</button><span class="sub" id="copy-st"></span></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+  if(!window.THREE||!THREE.OrbitControls){document.getElementById('sv').insertAdjacentHTML('afterbegin','<p class="err">Die 3D-Ansicht konnte nicht geladen werden.</p>');return}
+  /* ---------- Beispielgrundriss (Meter) ---------- */
+  const ROOMS=[
+    {id:'flur',  name:'Flur',        x:[0,2.2],  z:[0,4.5],  floor:'#b89f82'},
+    {id:'kueche',name:'Küche',       x:[2.2,5.2],z:[0,3],    floor:'#d3d6d5'},
+    {id:'wohn',  name:'Wohnzimmer',  x:[2.2,7.5],z:[3,7.5],  floor:'#b98a5c'},
+    {id:'balkon',name:'Balkon',      x:[2.2,7.5],z:[7.5,9],  floor:'#9c968c', outdoor:true},
+    {id:'kind',  name:'Kinderzimmer',x:[5.2,11], z:[0,3],    floor:'#c49b70'},
+    {id:'schlaf',name:'Schlafzimmer',x:[7.5,11], z:[3,7.5],  floor:'#c49b70'},
+    {id:'bad',   name:'Bad',         x:[0,2.2],  z:[4.5,7.5],floor:'#dfe3e6'}
+  ];
+  const DOORS=[{l:'z',c:0,a:.6,b:1.5},{l:'z',c:4.5,a:.6,b:1.4},{l:'x',c:2.2,a:1,b:1.9},{l:'x',c:2.2,a:3.4,b:4.3},
+    {l:'z',c:3,a:3.2,b:4.8},{l:'z',c:3,a:5.6,b:6.5},{l:'x',c:7.5,a:3.6,b:4.5},{l:'z',c:7.5,a:3.8,b:6.6}];
+  const WINDOWS=[{l:'z',c:0,a:3.3,b:4.5},{l:'z',c:0,a:6.8,b:8.6},{l:'x',c:11,a:4.6,b:6.4},{l:'x',c:11,a:.9,b:2.1},{l:'x',c:0,a:5.6,b:6.6},{l:'z',c:7.5,a:2.6,b:3.5},{l:'z',c:7.5,a:8.2,b:10.2}];
+  const NODES={flur:[1.1,2.6],kueche:[3.8,1.6],wohn:[4.4,5.3],balkon:[4.9,8.3],kind:[8.1,1.6],schlaf:[9.0,5.4],bad:[1.1,6.1]};
+  const LINKS=[['flur','kueche',[2.2,1.45]],['flur','wohn',[2.2,3.85]],['flur','bad',[1.0,4.5]],['kueche','wohn',[4.0,3]],
+    ['wohn','kind',[6.05,3]],['wohn','schlaf',[7.5,4.05]],['wohn','balkon',[5.2,7.5]]];
+  const H=2.6, T=.12, EYE=1.55, C=new THREE.Vector3(5.5,0,4.6);
+  const qm=r=>(r.x[1]-r.x[0])*(r.z[1]-r.z[0]);
+  const fmt=n=>n.toFixed(1).replace('.',',');
+  const $=id=>document.getElementById(id);
+  const room=id=>ROOMS.find(r=>r.id===id);
+  const neighbours=id=>LINKS.filter(l=>l[0]===id||l[1]===id).map(l=>({to:l[0]===id?l[1]:l[0],door:l[2]}));
+  const sv=$('sv');
+
+  /* ---------- Szene ---------- */
+  const renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  sv.prepend(renderer.domElement);
+  const cv=renderer.domElement;
+  const scene=new THREE.Scene(); scene.background=new THREE.Color('#bcd6ea'); scene.fog=new THREE.Fog('#bcd6ea',35,110);
+  const camera=new THREE.PerspectiveCamera(50,1,.05,300); camera.rotation.order='YXZ';
+  const controls=new THREE.OrbitControls(camera,cv);
+  controls.enableDamping=true; controls.maxPolarAngle=Math.PI*.47; controls.minDistance=4; controls.maxDistance=34; controls.enablePan=false;
+  scene.add(new THREE.HemisphereLight(0xffffff,0x8a7f74,.6));
+  const sun=new THREE.DirectionalLight(0xfff3e0,.45); sun.position.set(-8,25,-20); scene.add(sun);
+
+  const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.9});
+  const G=n=>{const g=new THREE.Group(); g.name=n; scene.add(g); return g};
+  const envG=G('env'), floorG=G('floor'), ceilG=G('ceil'), wallG=G('wall'), furnG=G('furn');
+  const box=(p,w,h,d,x,y,z,m)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m); o.position.set(x,y,z); p.add(o); return o};
+
+  // Umgebung
+  const yard=new THREE.Mesh(new THREE.PlaneGeometry(240,240),mat('#8fa78a')); yard.rotation.x=-Math.PI/2; yard.position.y=-9; envG.add(yard);
+  [[-14,-6,8,22,14],[22,-4,10,26,12],[4,26,30,20,8],[-20,20,10,16,10],[14,-26,26,18,10]].forEach(([x,z,w,h,d],i)=>{
+    box(envG,w,h,d,x,-9+h/2,z,mat(['#d8cfc4','#cfd6dc','#e2d7c6'][i%3]))});
+  [[-2,14],[10,16],[16,12],[-6,12]].forEach(([x,z])=>{const t=new THREE.Mesh(new THREE.SphereGeometry(2.4,12,10),mat('#6f8f5f')); t.position.set(x,-3.5,z); envG.add(t);
+    const s=new THREE.Mesh(new THREE.CylinderGeometry(.25,.3,5,8),mat('#6b5545')); s.position.set(x,-6.5,z); envG.add(s)});
+  box(floorG,11.4,.3,9.6,5.5,-.17,4.6,mat('#cfc9c0'));
+
+  // Böden, Decken, Licht
+  ROOMS.forEach(r=>{
+    const w=r.x[1]-r.x[0], d=r.z[1]-r.z[0], cx=(r.x[0]+r.x[1])/2, cz=(r.z[0]+r.z[1])/2;
+    const f=box(floorG,w,.02,d,cx,.01,cz,mat(r.floor)); f.userData.room=r.id;
+    if(!r.outdoor){ box(ceilG,w,.02,d,cx,H,cz,new THREE.MeshBasicMaterial({color:'#e4e0d9'})); const l=new THREE.PointLight(0xfff1dc,.5,8,1.8); l.position.set(cx,H-.3,cz); scene.add(l); }
+  });
+
+  // Wände mit Türen und Fenstern
+  const wallM=mat('#ece7df'), glassM=new THREE.MeshStandardMaterial({color:'#a9cfe3',transparent:true,opacity:.22,roughness:.1}), frameM=mat('#e9e6e0');
+  const on=(list,l,c,lo,hi)=>list.filter(o=>o.l===l&&Math.abs(o.c-c)<1e-6&&o.a<hi-1e-6&&o.b>lo+1e-6);
+  function cut(lo,hi,ops){let s=[[lo,hi]]; ops.forEach(o=>{s=s.flatMap(([p,q])=>o.b<=p||o.a>=q?[[p,q]]:[[p,Math.max(p,o.a)],[Math.min(q,o.b),q]].filter(([u,v])=>v-u>.02))}); return s}
+  const seen=new Set();
+  function piece(alongX,c,a,b,y0,y1,m){const L=b-a, h=y1-y0; if(alongX) box(wallG,L+T,h,T,(a+b)/2,y0+h/2,c,m); else box(wallG,T,h,L+T,c,y0+h/2,(a+b)/2,m)}
+  function edge(alongX,c,lo,hi,rail){
+    const k=(alongX?'z':'x')+c.toFixed(2)+':'+lo.toFixed(2)+'-'+hi.toFixed(2); if(seen.has(k)) return; seen.add(k);
+    const l=alongX?'z':'x';
+    if(rail){ piece(alongX,c,lo,hi,0,1.0,glassM); piece(alongX,c,lo,hi,.98,1.04,frameM); return; }
+    const ds=on(DOORS,l,c,lo,hi), ws=on(WINDOWS,l,c,lo,hi);
+    cut(lo,hi,ds.concat(ws)).forEach(([a,b])=>piece(alongX,c,a,b,0,H,wallM));
+    ds.forEach(d=>piece(alongX,c,Math.max(lo,d.a),Math.min(hi,d.b),2.1,H,wallM));
+    ws.forEach(w=>{const a=Math.max(lo,w.a),b=Math.min(hi,w.b); piece(alongX,c,a,b,0,.9,wallM); piece(alongX,c,a,b,2.2,H,wallM); piece(alongX,c,a,b,.9,2.2,glassM)});
+  }
+  ROOMS.forEach(r=>{
+    const [x0,x1]=r.x,[z0,z1]=r.z;
+    if(r.outdoor){ edge(true,z1,x0,x1,true); edge(false,x0,z0,z1,true); edge(false,x1,z0,z1,true); return; }
+    edge(true,z0,x0,x1); edge(true,z1,x0,x1); edge(false,x0,z0,z1); edge(false,x1,z0,z1);
+  });
+  // dunkle Schnittkante oben, sichtbar im Puppenhaus
+  const capM=mat('#2c3540');
+  wallG.children.slice().forEach(m=>{ if(m.material===wallM&&m.position.y+m.geometry.parameters.height/2>H-.01){ const p=m.geometry.parameters; box(wallG,p.width+.002,.02,p.depth+.002,m.position.x,H+.01,m.position.z,capM) } });
+
+  // Möbel
+  const F=(x,z,w,d,h,c,y)=>box(furnG,w,h,d,x+w/2,(y||0)+h/2+.02,z+d/2,mat(c));
+  F(.15,1.9,.45,1.4,1.9,'#e3dccf'); F(.15,.9,.05,.7,.9,'#9fb3c4',.9);
+  F(2.3,.1,2.8,.62,.9,'#f1efe9'); F(2.3,.1,2.8,.62,.04,'#4a4f55',.9); F(4.55,.75,.6,.6,1.9,'#dfe3e6'); F(2.4,.1,1.2,.35,.7,'#e9e6e0',1.5);
+  F(2.6,6.3,2.4,.9,.45,'#5e7183'); F(2.6,6.95,2.4,.25,.8,'#5e7183'); F(2.6,5.5,.9,.8,.45,'#5e7183');
+  F(3.6,4.9,1.2,.7,.42,'#8a6a4f'); F(3.3,4.6,2.0,1.6,.01,'#c9b9a6');
+  F(5.6,3.6,1.6,.9,.75,'#a07c5a'); F(5.4,3.8,.4,.4,.45,'#3d4650'); F(7.0,3.8,.4,.4,.45,'#3d4650');
+  F(2.3,4.0,.35,1.6,.5,'#3d4650'); F(2.28,4.2,.05,1.2,.7,'#111418',.75);
+  F(3.2,8.0,.55,.55,.5,'#c8cdd2'); F(4.0,8.0,.6,.6,.72,'#c8cdd2'); F(4.9,8.0,.55,.55,.5,'#c8cdd2'); F(6.6,7.9,.5,.5,.6,'#8a6a4f'); F(6.65,7.95,.4,.4,.6,'#6f8f5f',.6);
+  F(9.7,.2,1.0,2.0,.5,'#d9a066'); F(9.7,.2,1.0,.15,.9,'#c58a52'); F(5.5,.2,1.4,.65,.75,'#e8e2d8'); F(7.6,.15,1.0,.55,1.8,'#b7c4cf');
+  F(8.3,5.3,1.8,2.0,.55,'#7d93a6'); F(8.3,7.2,1.8,.12,1.0,'#5f6f7e'); F(10.3,3.3,.6,2.2,2.1,'#e8e2d8'); F(7.7,6.9,.45,.4,.5,'#a07c5a'); F(10.25,6.9,.45,.4,.5,'#a07c5a');
+  F(.15,6.55,1.75,.8,.55,'#ffffff'); F(1.55,4.75,.5,.45,.85,'#ffffff'); F(1.5,4.62,.6,.05,.7,'#cfe3ee',1.1); F(.2,4.75,.4,.6,.42,'#ffffff');
+
+  /* ---------- Zustand ---------- */
+  let mode='house', cur=null, yaw=0, pitch=-.12, low=false, fly=null;
+  const pos=new THREE.Vector3();
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dirOf=(y,p)=>new THREE.Vector3(Math.sin(y)*Math.cos(p),Math.sin(p),Math.cos(y)*Math.cos(p));
+  const ovPos=()=>C.clone().add(new THREE.Vector3(-3,15.5,14).multiplyScalar(Math.max(1,1.12/(camera.aspect||1.5))));
+  const SKY=new THREE.Color('#bcd6ea'), STAGE=new THREE.Color('#e3e7eb');
+  function showEnv(on){envG.visible=on; scene.background=on?SKY:STAGE; scene.fog.color.copy(on?SKY:STAGE)}
+  function setWhere(t,s){$('where').innerHTML='<b>'+t+'</b><span>'+s+'</span>'}
+
+  /* Puppenhaus-Beschriftungen */
+  const labels=ROOMS.map(r=>{const b=document.createElement('button'); b.type='button'; b.className='lbl';
+    b.innerHTML=r.name+'<small>'+fmt(qm(r))+' m²</small>'; b.addEventListener('click',()=>enter(r.id)); sv.appendChild(b); b._r=r; return b});
+
+  /* Pfeile innen */
+  const arrowShape=new THREE.Shape(); [[0,.42],[.32,0],[.12,0],[.12,-.3],[-.12,-.3],[-.12,0],[-.32,0],[0,.42]].forEach(([x,y],i)=>i?arrowShape.lineTo(x,y):arrowShape.moveTo(x,y));
+  const arrowGeo=new THREE.ShapeGeometry(arrowShape), ringGeo=new THREE.RingGeometry(.4,.48,40);
+  let arrows=[], tags=[];
+  function clearArrows(){arrows.forEach(a=>scene.remove(a)); tags.forEach(t=>t.remove()); arrows=[]; tags=[]}
+  function buildArrows(id){
+    clearArrows(); const [nx,nz]=NODES[id];
+    neighbours(id).forEach(n=>{
+      const dx=n.door[0]-nx, dz=n.door[1]-nz, len=Math.hypot(dx,dz), ux=dx/len, uz=dz/len, dist=Math.max(.9,len-.35);
+      const grp=new THREE.Group(); grp.position.set(nx+ux*dist,.03,nz+uz*dist);
+      const ring=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.7,depthWrite:false})); ring.rotation.x=-Math.PI/2; grp.add(ring);
+      const ar=new THREE.Mesh(arrowGeo,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.95,depthWrite:false})); ar.rotation.x=-Math.PI/2; ar.position.y=.005;
+      const holder=new THREE.Group(); holder.rotation.y=Math.atan2(ux,uz)+Math.PI; holder.add(ar); grp.add(holder);
+      ring.userData.to=n.to; ar.userData.to=n.to; if(REC) grp.visible=false; scene.add(grp); arrows.push(grp);
+      const t=document.createElement('button'); t.className='go'; t.type='button'; t.textContent=room(n.to).name; t.addEventListener('click',()=>walk(n.to));
+      t._p=new THREE.Vector3(n.door[0],1.75,n.door[1]); sv.appendChild(t); tags.push(t);
+    });
+  }
+
+  /* ---------- Kamerafahrten ---------- */
+  // fly: Liste von Wegpunkten {p: Position, l: Blickziel}, gleichmäßig über die Dauer verteilt
+  function startFly(pts,dur,done){ fly={pts,t0:performance.now(),dur:reduce?1:dur,done}; }
+  const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  const tmpL=new THREE.Vector3();
+  function stepFly(now){
+    const t=Math.max(0,Math.min(1,(now-fly.t0)/fly.dur)), n=fly.pts.length-1, s=Math.min(n-1,Math.floor(t*n)), u=ease(t*n-s);
+    const a=fly.pts[s], b=fly.pts[s+1];
+    camera.position.lerpVectors(a.p,b.p,u); tmpL.lerpVectors(a.l,b.l,u); camera.lookAt(tmpL);
+    if(fly.onStep) fly.onStep(t);
+    if(t>=1){const d=fly.done; fly=null; d&&d()}
+  }
+  function enter(id,cb){
+    if(fly||mode!=='house') return;
+    const [nx,nz]=NODES[id], f=controls.target.clone().sub(camera.position); f.y=0; f.normalize();
+    yaw=Math.atan2(f.x,f.z); pitch=-.12;
+    const eye=new THREE.Vector3(nx,EYE,nz), above=new THREE.Vector3(nx,6.5,nz).addScaledVector(f,-.6);
+    const floorPt=new THREE.Vector3(nx,0,nz).addScaledVector(f,2.2);
+    mode='fly'; controls.enabled=false; labels.forEach(l=>l.style.display='none'); wallG.scale.y=1; $('low').hidden=true;
+    setWhere(room(id).name,'Du gehst hinein …');
+    startFly([{p:camera.position.clone(),l:controls.target.clone()},{p:above,l:floorPt},{p:eye,l:eye.clone().add(dirOf(yaw,pitch))}],2000,()=>{
+      ceilG.visible=true; showEnv(true); pos.copy(eye); cur=id; mode='inside'; camera.fov=72; camera.updateProjectionMatrix();
+      sv.classList.add('inside'); $('mapbox').hidden=false; $('out').hidden=false; $('hint').textContent='Ziehen zum Umschauen · Pfeil oder Raumschild antippen zum Weitergehen · Grundriss antippen zum Springen';
+      setRoomInfo(); buildArrows(id); applyPano(); cb&&cb();
+    });
+    fly.onStep=t=>{ if(t>.8&&!ceilG.visible){ceilG.visible=true; showEnv(true)} camera.fov=50+22*Math.max(0,(t-.5)*2); camera.updateProjectionMatrix() };
+  }
+  function leave(cb){
+    if(fly||mode!=='inside') return;
+    clearArrows(); setPano(false,true); mode='fly'; $('mapbox').hidden=true; $('out').hidden=true; sv.classList.remove('inside');
+    const look=pos.clone().add(dirOf(yaw,pitch)), f=dirOf(yaw,0);
+    const above=pos.clone().setY(6.5).addScaledVector(f,-.6), floorPt=pos.clone().setY(0).addScaledVector(f,2.2);
+    const end=ovPos(), endL=C.clone();
+    setWhere('Puppenhaus','Raum antippen, um hineinzugehen');
+    startFly([{p:pos.clone(),l:look},{p:above,l:floorPt},{p:end,l:endL}],2000,()=>{
+      mode='house'; controls.target.copy(endL); controls.enabled=true; controls.update(); labels.forEach(l=>l.style.display='');
+      $('low').hidden=false; wallG.scale.y=low?.38:1; $('hint').textContent='Ziehen zum Drehen · Zoomen mit Mausrad oder zwei Fingern · Raum antippen zum Hineingehen'; cb&&cb();
+    });
+    fly.onStep=t=>{ if(t>.15&&ceilG.visible){ceilG.visible=false; showEnv(false)} camera.fov=72-22*Math.min(1,t*2); camera.updateProjectionMatrix() };
+  }
+  function setRoomInfo(){const r=room(cur); setWhere(r.name,fmt(qm(r))+' m²'+(r.outdoor?' · außen':''))}
+
+  /* Gehen innen */
+  let walkA=null;
+  function nearAngle(from,to){let d=to-from; while(d>Math.PI)d-=2*Math.PI; while(d<-Math.PI)d+=2*Math.PI; return from+d}
+  function walk(to,jump,cb){
+    if(mode!=='inside'||walkA||to===cur){cb&&cb(); return;}
+    const link=neighbours(cur).find(n=>n.to===to), end=new THREE.Vector3(NODES[to][0],EYE,NODES[to][1]);
+    clearArrows(); setPano(false,true);
+    if(jump||!link||reduce){ pos.copy(end); cur=to; setRoomInfo(); buildArrows(to); applyPano(); cb&&cb(); return; }
+    const door=new THREE.Vector3(link.door[0],EYE,link.door[1]);
+    const y1=nearAngle(yaw,Math.atan2(door.x-pos.x,door.z-pos.z));
+    walkA={pts:[pos.clone(),door,end],t0:performance.now(),dur:1500,y0:yaw,y1,y2:nearAngle(y1,Math.atan2(end.x-door.x,end.z-door.z)),to,cb};
+  }
+
+  /* ---------- Eingabe ---------- */
+  const ray=new THREE.Raycaster(), m2=new THREE.Vector2(); let drag=null;
+  function setRay(e){const r=cv.getBoundingClientRect(); m2.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1); ray.setFromCamera(m2,camera)}
+  function pickArrow(e){setRay(e); const o=[]; arrows.forEach(a=>a.traverse(x=>{if(x.isMesh)o.push(x)})); const h=ray.intersectObjects(o,false)[0]; return h?h.object.userData.to:null}
+  function pickRoom(e){setRay(e); const h=ray.intersectObjects(floorG.children,false).find(x=>x.object.userData.room); return h?h.object.userData.room:null}
+  cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,yaw,pitch,moved:false}});
+  cv.addEventListener('pointermove',e=>{
+    if(drag&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>5) drag.moved=true;
+    if(mode==='inside'){
+      if(drag&&e.buttons){ cv.classList.add('drag'); const k=(camera.fov/72)*.0042; yaw=drag.yaw+(e.clientX-drag.x)*k; pitch=Math.max(-1.2,Math.min(1.2,drag.pitch+(e.clientY-drag.y)*k)); }
+      else cv.classList.toggle('hot',!!pickArrow(e));
+    } else if(mode==='house'&&!e.buttons) cv.classList.toggle('hot',!!pickRoom(e));
+  });
+  window.addEventListener('pointerup',e=>{
+    if(drag&&!drag.moved&&e.target===cv){
+      if(mode==='inside'){const to=pickArrow(e); if(to) walk(to)}
+      else if(mode==='house'){const r=pickRoom(e); if(r) enter(r)}
+    }
+    drag=null; cv.classList.remove('drag');
+  });
+  cv.addEventListener('wheel',e=>{ if(mode!=='inside') return; e.preventDefault(); camera.fov=Math.max(40,Math.min(85,camera.fov+e.deltaY*.03)); camera.updateProjectionMatrix() },{passive:false});
+  document.addEventListener('keydown',e=>{
+    if(mode!=='inside'||(e.target.closest&&e.target.closest('input,textarea'))) return;
+    if(e.key==='ArrowLeft'){yaw+=.15;e.preventDefault()} else if(e.key==='ArrowRight'){yaw-=.15;e.preventDefault()}
+    else if(e.key==='ArrowUp'){let best=null,bd=1; neighbours(cur).forEach(n=>{const d=Math.abs(nearAngle(yaw,Math.atan2(n.door[0]-pos.x,n.door[1]-pos.z))-yaw); if(d<bd){bd=d;best=n.to}}); if(best){walk(best);e.preventDefault()}}
+    else if(e.key==='Escape') leave();
+  });
+  $('out').addEventListener('click',leave);
+  $('low').addEventListener('click',()=>{low=!low; $('low').setAttribute('aria-pressed',String(low)); wallG.scale.y=low?.38:1});
+  $('fs').addEventListener('click',()=>{try{ if(document.fullscreenElement) document.exitFullscreen(); else sv.requestFullscreen().catch(()=>{$('fs').hidden=true}) }catch(e){$('fs').hidden=true}});
+  if(!sv.requestFullscreen) $('fs').hidden=true;
+
+  /* ---------- Mini-Grundriss ---------- */
+  const map=$('map'), mc=map.getContext('2d'), S=30, OX=25, OY=15;
+  function drawMap(){
+    mc.clearRect(0,0,map.width,map.height);
+    ROOMS.forEach(r=>{ mc.fillStyle=r.id===cur?'#bfe3df':(r.outdoor?'#e7e4df':'#f4f2ee'); mc.fillRect(OX+r.x[0]*S,OY+r.z[0]*S,(r.x[1]-r.x[0])*S,(r.z[1]-r.z[0])*S);
+      mc.strokeStyle=r.outdoor?'#9aa5ad':'#2c3540'; mc.lineWidth=r.outdoor?2:4; mc.strokeRect(OX+r.x[0]*S,OY+r.z[0]*S,(r.x[1]-r.x[0])*S,(r.z[1]-r.z[0])*S) });
+    mc.fillStyle='#f4f2ee'; DOORS.forEach(d=>{ if(d.l==='z') mc.fillRect(OX+d.a*S,OY+d.c*S-4,(d.b-d.a)*S,8); else mc.fillRect(OX+d.c*S-4,OY+d.a*S,8,(d.b-d.a)*S) });
+    Object.keys(NODES).forEach(id=>{ if(id===cur) return; const [x,z]=NODES[id]; mc.beginPath(); mc.arc(OX+x*S,OY+z*S,5,0,7); mc.fillStyle='#8a97a3'; mc.fill() });
+    const px=OX+pos.x*S, pz=OY+pos.z*S, half=(camera.fov*Math.PI/180)/2*Math.max(1,camera.aspect)*.75;
+    mc.beginPath(); mc.moveTo(px,pz); mc.arc(px,pz,55,Math.PI/2-yaw-half,Math.PI/2-yaw+half); mc.closePath(); mc.fillStyle='rgba(11,110,105,.28)'; mc.fill();
+    mc.beginPath(); mc.arc(px,pz,8,0,7); mc.fillStyle='#0b6e69'; mc.fill(); mc.lineWidth=3; mc.strokeStyle='#fff'; mc.stroke();
+  }
+  map.addEventListener('click',e=>{
+    const r=map.getBoundingClientRect(), x=((e.clientX-r.left)/r.width*map.width-OX)/S, z=((e.clientY-r.top)/r.height*map.height-OY)/S;
+    const hit=ROOMS.find(q=>x>=q.x[0]&&x<=q.x[1]&&z>=q.z[0]&&z<=q.z[1]); if(hit) walk(hit.id,true);
+  });
+
+  /* ---------- 360°-Fotos ---------- */
+  const panos={}; let panoFade=null, panA=null, REC=null;
+  const sphere=new THREE.Mesh(new THREE.SphereGeometry(40,64,40),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,fog:false}));
+  sphere.geometry.scale(-1,1,1); sphere.visible=false; sphere.renderOrder=-1; scene.add(sphere);
+  function modelVisible(v){ floorG.visible=v; wallG.visible=v; furnG.visible=v; if(v){ ceilG.visible=(mode!=='house'); showEnv(mode!=='house') } else { ceilG.visible=false; envG.visible=false } }
+  function setPano(on,instant){
+    if(!on){ panoFade=null; sphere.visible=false; sphere.material.opacity=0; modelVisible(true); return; }
+    const p=panos[cur]; sphere.material.map=p.tex; sphere.material.needsUpdate=true; sphere.rotation.y=p.rot*Math.PI/180;
+    sphere.visible=true; if(instant||reduce){sphere.material.opacity=1; modelVisible(false)} else { sphere.material.opacity=0; panoFade={t0:performance.now(),dur:450} }
+  }
+  function applyPano(){ if(mode==='inside'&&cur&&panos[cur]) setPano(true); else if(sphere.visible) setPano(false) }
+  const loader=new THREE.TextureLoader();
+  function renderPanoList(){
+    $('panos').innerHTML=ROOMS.map(r=>{const p=panos[r.id];
+      return '<div class="pr"><div class="head"><div><b>'+r.name+'</b> <span class="sub '+(p?'ok':'')+'" id="ps-'+r.id+'">'+(p?(p.warn?'Foto geladen, aber nicht 2:1':'360°-Foto geladen'):'Modellansicht')+'</span></div>'+
+        '<div class="row"><label class="btn small">'+(p?'Ersetzen':'360°-Foto wählen')+'<input type="file" accept="image/jpeg,image/png,image/webp" hidden data-pano="'+r.id+'"></label>'+
+        '<button class="btn small" type="button" data-goto="'+r.id+'">Ansehen</button>'+(p?'<button class="btn small" type="button" data-prm="'+r.id+'">Entfernen</button>':'')+'</div></div>'+
+        (p?'<label class="rot">Ausrichtung<input type="range" min="0" max="359" value="'+p.rot+'" data-rot="'+r.id+'" aria-label="Ausrichtung '+r.name+'"></label>':'')+'</div>'}).join('');
+  }
+  $('panos').addEventListener('change',e=>{
+    const id=e.target.getAttribute('data-pano'); if(!id) return; const f=e.target.files[0]; e.target.value=''; if(!f) return;
+    if(!/^image\/(jpeg|png|webp)$/.test(f.type)){ $('ps-'+id).textContent='Bitte JPG, PNG oder WebP wählen.'; return; }
+    const url=URL.createObjectURL(f); $('ps-'+id).textContent='Lädt …';
+    loader.load(url,tex=>{
+      const im=tex.image, ratio=im.width/im.height; tex.minFilter=THREE.LinearFilter;
+      if(panos[id]&&panos[id].tex) panos[id].tex.dispose();
+      panos[id]={tex,rot:panos[id]?panos[id].rot:0,warn:ratio<1.85||ratio>2.15};
+      renderPanoList(); if(mode==='inside'&&cur===id) setPano(true);
+    },undefined,()=>{ $('ps-'+id).textContent='Das Bild ließ sich nicht laden.'; });
+  });
+  $('panos').addEventListener('input',e=>{const id=e.target.getAttribute('data-rot'); if(!id||!panos[id]) return; panos[id].rot=+e.target.value; if(cur===id&&sphere.visible) sphere.rotation.y=panos[id].rot*Math.PI/180});
+  $('panos').addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b||REC) return; let id;
+    if((id=b.getAttribute('data-goto'))){ sv.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'}); if(mode==='house') enter(id); else if(mode==='inside') walk(id,true); }
+    if((id=b.getAttribute('data-prm'))){ panos[id].tex.dispose(); delete panos[id]; renderPanoList(); if(cur===id) setPano(false,true); }
+  });
+  renderPanoList();
+
+  /* ---------- Rundgang als Video ---------- */
+  let DL=null; try{ if(window.claude&&window.claude.use) window.claude.use('downloads').then(d=>{DL=d}).catch(()=>{}) }catch(e){}
+  const P=fn=>new Promise(res=>fn(res));
+  const wait=ms=>new Promise(res=>setTimeout(res,ms));
+  const linked=(a,b)=>LINKS.some(l=>(l[0]===a&&l[1]===b)||(l[0]===b&&l[1]===a));
+  const ROUTE=['flur','bad','flur','kueche','wohn','kind','wohn','schlaf','wohn','balkon'];
+  let videoBlob=null, videoExt='webm';
+  function pickMime(){for(const m of ['video/mp4;codecs=avc1.42E01E','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']){try{if(MediaRecorder.isTypeSupported(m)) return m}catch(e){}} return ''}
+  $('rec').addEventListener('click',recordTour);
+  $('rec-x').addEventListener('click',()=>{ if(REC) REC.cancel=true; });
+  async function recordTour(){
+    if(REC||fly||walkA) return;
+    if(!window.MediaRecorder){ $('rec-st').textContent='Dieser Browser kann kein Video aufnehmen. Nimm Chrome, Edge oder Firefox.'; return; }
+    $('rec').disabled=true; $('vid').hidden=true; $('vid-act').hidden=true; $('rec-st').textContent='';
+    sv.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
+    if(mode==='inside') await P(cb=>leave(cb));
+    const W=1280,H=720, pr=renderer.getPixelRatio();
+    const comp=document.createElement('canvas'); comp.width=W; comp.height=H; const c2=comp.getContext('2d');
+    const mime=pickMime(); videoExt=mime.indexOf('mp4')>=0?'mp4':'webm';
+    let rec; try{ rec=new MediaRecorder(comp.captureStream(30),mime?{mimeType:mime,videoBitsPerSecond:7000000}:{videoBitsPerSecond:7000000}) }catch(e){ $('rec-st').textContent='Die Aufnahme ließ sich nicht starten.'; $('rec').disabled=false; return; }
+    const chunks=[]; rec.ondataavailable=e=>{if(e.data&&e.data.size) chunks.push(e.data)};
+    const t0=performance.now();
+    REC={cancel:false,frame(now){
+      c2.drawImage(cv,0,0,W,H);
+      const el=(now-t0)/1000;
+      if(mode==='house'&&el<4.5){ c2.globalAlpha=Math.min(1,el*2,(4.5-el)*2); cap(c2,'Beispielwohnung','82,5 m² · 3 Zimmer · Balkon',true); c2.globalAlpha=1; }
+      if(mode!=='house'&&cur){ const r=room(cur); cap(c2,r.name,fmt(qm(r))+' m²'); }
+      if(el<.4){c2.fillStyle='rgba(0,0,0,'+(1-el/.4)+')'; c2.fillRect(0,0,W,H)}
+      $('rec-msg').textContent='Video wird aufgenommen · '+Math.floor(el)+' s';
+    }};
+    renderer.setPixelRatio(1); renderer.setSize(W,H,false); camera.aspect=W/H; camera.updateProjectionMatrix();
+    sv.classList.add('recording'); $('recov').hidden=false; $('blocker').hidden=false; controls.enabled=false;
+    camera.position.copy(ovPos()); controls.target.copy(C); controls.update();
+    rec.start(500);
+    const check=()=>{ if(REC.cancel) throw new Error('cancel') };
+    try{
+      controls.enabled=true; controls.enableRotate=false; controls.autoRotate=true; controls.autoRotateSpeed=2.2; await wait(4500); controls.autoRotate=false; check();
+      await P(cb=>enter(ROUTE[0],cb)); check();
+      const seenR=new Set([ROUTE[0]]); if(panos[cur]) await wait(500); await P(cb=>{panA={y0:yaw,y1:yaw+1.4,t0:performance.now(),dur:2600,cb}}); check();
+      for(let i=1;i<ROUTE.length;i++){
+        const to=ROUTE[i]; await P(cb=>walk(to,!linked(cur,to),cb)); check();
+        if(!seenR.has(to)){ seenR.add(to); if(panos[to]) await wait(500); await P(cb=>{panA={y0:yaw,y1:yaw+1.3,t0:performance.now(),dur:2400,cb}}); check(); }
+      }
+      await P(cb=>leave(cb)); check();
+      controls.enableRotate=false; controls.autoRotate=true; await wait(3000); controls.autoRotate=false;
+    }catch(e){}
+    const cancelled=REC.cancel;
+    await new Promise(res=>{rec.onstop=res; try{rec.stop()}catch(e){res()}});
+    REC=null; controls.autoRotate=false; controls.enableRotate=true;
+    sv.classList.remove('recording'); $('recov').hidden=true; $('blocker').hidden=true;
+    renderer.setPixelRatio(pr); resize(); $('rec').disabled=false;
+    if(cancelled){ $('rec-st').textContent='Aufnahme abgebrochen.'; if(mode==='inside') leave(); return; }
+    videoBlob=new Blob(chunks,{type:(mime||'video/webm').split(';')[0]});
+    const v=$('vid'); v.src=URL.createObjectURL(videoBlob); v.hidden=false; $('vid-act').hidden=false;
+    $('rec-st').textContent='Fertig: '+Math.round((performance.now()-t0)/1000)+' Sekunden, 1280×720, '+videoExt.toUpperCase()+', '+(videoBlob.size/1048576).toFixed(1)+' MB.';
+    $('dl').hidden=!DL; $('dl-st').textContent=DL?'':'Herunterladen geht nur in der Claude-Ansicht.';
+  }
+  function cap(c,t,sub,center){
+    c.save(); const pad=36;
+    c.font='700 40px "Space Grotesk",Arial,sans-serif'; const w1=c.measureText(t).width; c.font='500 22px Inter,Arial,sans-serif'; const w2=c.measureText(sub).width;
+    const bw=Math.max(w1,w2)+48, bh=104, x=center?(1280-bw)/2:pad, y=center?60:720-pad-bh;
+    c.fillStyle='rgba(12,17,22,.72)'; c.beginPath(); if(c.roundRect) c.roundRect(x,y,bw,bh,14); else c.rect(x,y,bw,bh); c.fill();
+    c.fillStyle='#fff'; c.textAlign=center?'center':'left'; const tx=center?640:x+24;
+    c.font='700 40px "Space Grotesk",Arial,sans-serif'; c.fillText(t,tx,y+50); c.font='500 22px Inter,Arial,sans-serif'; c.globalAlpha*=.85; c.fillText(sub,tx,y+84); c.restore();
+  }
+  $('dl').addEventListener('click',()=>{ if(!DL||!videoBlob) return; $('dl-st').textContent='';
+    DL.save({filename:'rundgang-beispielwohnung.'+videoExt,data:videoBlob}).then(()=>{$('dl-st').textContent='Gespeichert.'}).catch(e=>{ if(!e||e.code!=='declined') $('dl-st').textContent='Herunterladen hat nicht geklappt.' }); });
+  $('copy').addEventListener('click',()=>{
+    const fb=()=>{const s=window.getSelection(),rg=document.createRange(); rg.selectNodeContents($('snip')); s.removeAllRanges(); s.addRange(rg); $('copy-st').textContent='Markiert, jetzt mit Strg+C kopieren.'};
+    try{navigator.clipboard.writeText($('snip').textContent).then(()=>{$('copy-st').textContent='Kopiert.'},fb)}catch(e){fb()}
+  });
+
+  /* ---------- Schleife ---------- */
+  const v=new THREE.Vector3();
+  function project(el,p3){ v.copy(p3).project(camera); const w=sv.clientWidth,h=sv.clientHeight, vis=v.z<1&&Math.abs(v.x)<1.1&&Math.abs(v.y)<1.1;
+    el.style.display=vis?'':'none'; el.style.transform='translate('+((v.x*.5+.5)*w)+'px,'+((-v.y*.5+.5)*h)+'px) translate(-50%,-50%)' }
+  function resize(){if(REC) return; const w=sv.clientWidth,h=sv.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix()}
+  new ResizeObserver(resize).observe(sv); resize();
+  ceilG.visible=false; showEnv(false);
+  camera.position.copy(ovPos()); controls.target.copy(C); controls.update();
+  function loop(now){
+    if(fly) stepFly(now);
+    else if(mode==='house'){ controls.update(); }
+    else if(mode==='inside'){
+      if(walkA){
+        const t=Math.max(0,Math.min(1,(now-walkA.t0)/walkA.dur)), e=ease(t), p=walkA.pts;
+        if(e<.5){pos.lerpVectors(p[0],p[1],e*2); yaw=walkA.y0+(walkA.y1-walkA.y0)*Math.min(1,e*3)}
+        else{pos.lerpVectors(p[1],p[2],(e-.5)*2); yaw=walkA.y1+(walkA.y2-walkA.y1)*Math.min(1,(e-.5)*2.5)}
+        pos.y=EYE+Math.sin(e*Math.PI*4)*.012;
+        if(t>=1){pos.y=EYE; cur=walkA.to; const c=walkA.cb; walkA=null; setRoomInfo(); buildArrows(cur); applyPano(); c&&c()}
+      }
+      if(panA){const t=Math.max(0,Math.min(1,(now-panA.t0)/panA.dur)); yaw=panA.y0+(panA.y1-panA.y0)*ease(t); if(t>=1){const c=panA.cb; panA=null; c&&c()}}
+      camera.position.copy(pos); camera.rotation.set(pitch,yaw+Math.PI,0);
+    }
+    sphere.position.copy(camera.position);
+    if(panoFade){const t=Math.max(0,Math.min(1,(now-panoFade.t0)/panoFade.dur)); sphere.material.opacity=t; if(t>=1){panoFade=null; modelVisible(false)}}
+    renderer.render(scene,camera);
+    if(REC) REC.frame(now);
+    if(mode==='house') labels.forEach(l=>{ const r=l._r; project(l,new THREE.Vector3((r.x[0]+r.x[1])/2,low?1.2:.4,(r.z[0]+r.z[1])/2)) });
+    if(mode==='inside'){ tags.forEach(t=>project(t,t._p)); drawMap(); }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+
+</body>
+</html>
