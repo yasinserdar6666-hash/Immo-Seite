@@ -10,37 +10,37 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: Arbeitsfläche links (4 echte Schritte), Live-Vorschau rechts. Schritt 1: Grundriss oben, darunter ein Fach pro Raum. */
 :root{
-  --bg:#f2f4f6; --surface:#ffffff; --surface-2:#e9edf1; --ink:#13202c; --muted:#546372;
-  --line:#d3dbe2; --accent:#0b6e69; --accent-ink:#ffffff; --accent-soft:#d9efed; --warn:#8a5200; --warn-soft:#fbeed8;
-  --bad:#a3271f; --font-d:'Space Grotesk','Helvetica Neue',Arial,sans-serif; --font-b:'Inter','Helvetica Neue',Arial,sans-serif;
-  --r:10px;
+  --bg:#f6f5f2; --surface:#ffffff; --surface-2:#efede8; --ink:#1c1e21; --muted:#6b6e73;
+  --line:#e3e0da; --accent:#1f3550; --accent-ink:#ffffff; --accent-soft:#e6ebf1; --warn:#7a5a22; --warn-soft:#f5efe4;
+  --bad:#a3271f; --font-d:'Inter','Helvetica Neue',Arial,sans-serif; --font-b:'Inter','Helvetica Neue',Arial,sans-serif;
+  --r:8px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0f161d; --surface:#17212b; --surface-2:#1f2b37; --ink:#e8eef3; --muted:#9aa9b7;
-    --line:#2b3947; --accent:#3fb8b0; --accent-ink:#06201e; --accent-soft:#143a38; --warn:#f0b35a; --warn-soft:#3a2b12; --bad:#ff8a80; color-scheme:dark;
+    --bg:#131416; --surface:#1b1c1e; --surface-2:#242528; --ink:#ecebe8; --muted:#a2a4a8;
+    --line:#323438; --accent:#9fb4cf; --accent-ink:#10161e; --accent-soft:#222a35; --warn:#d2b98a; --warn-soft:#2a2620; --bad:#ff8a80; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0f161d; --surface:#17212b; --surface-2:#1f2b37; --ink:#e8eef3; --muted:#9aa9b7;
-  --line:#2b3947; --accent:#3fb8b0; --accent-ink:#06201e; --accent-soft:#143a38; --warn:#f0b35a; --warn-soft:#3a2b12; --bad:#ff8a80; color-scheme:dark;
+  --bg:#131416; --surface:#1b1c1e; --surface-2:#242528; --ink:#ecebe8; --muted:#a2a4a8;
+  --line:#323438; --accent:#9fb4cf; --accent-ink:#10161e; --accent-soft:#222a35; --warn:#d2b98a; --warn-soft:#2a2620; --bad:#ff8a80; color-scheme:dark;
 }
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:15px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
 h1,h2,h3{font-family:var(--font-d);margin:0;text-wrap:balance;line-height:1.2}
-h1{font-size:22px;letter-spacing:-.01em}
+h1{font-size:22px;font-weight:600;letter-spacing:-.015em}
 h2{font-size:20px;margin-bottom:4px}
-h3{font-size:15px}
+h3{font-size:15px;font-weight:600}
 p{margin:0}
 .wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 header{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
 .tag{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.notice{background:var(--warn-soft);color:var(--warn);border-radius:var(--r);padding:10px 14px;font-size:13px}
+.notice{background:var(--surface);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:10px 14px;font-size:13px}
 .steps{display:flex;gap:6px;flex-wrap:wrap;padding:0;margin:0;list-style:none}
 .steps button{font:inherit;font-size:13px;display:flex;gap:8px;align-items:center;background:var(--surface);color:var(--muted);
   border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 8px;cursor:pointer}
@@ -573,10 +573,10 @@ canvas.out,video.out{display:block;width:100%;height:auto;border-radius:var(--r)
     const z=z0+(z1-z0)*e, dx=(x0+(x1-x0)*e)*W;
     if(img){const s=Math.max(W/img.width,H/img.height)*z,w=img.width*s,h=img.height*s; ctx.drawImage(img,(W-w)/2+dx,(H-h)/2,w,h)}
     else{const g=grad(rtype(item.p)),gr=ctx.createLinearGradient(0,0,W,H); gr.addColorStop(0,g[0]); gr.addColorStop(1,g[1]); ctx.fillStyle=gr; ctx.fillRect(0,0,W,H);
-      ctx.fillStyle='rgba(255,255,255,.85)'; ctx.font='500 '+Math.round(Math.min(W,H)*.06)+'px "Space Grotesk",Arial,sans-serif'; ctx.textAlign='center'; ctx.fillText(rname(item.p)+' (Platzhalter)',W/2,H*.42,W*.9); ctx.textAlign='left'}
+      ctx.fillStyle='rgba(255,255,255,.85)'; ctx.font='500 '+Math.round(Math.min(W,H)*.06)+'px Inter,Arial,sans-serif'; ctx.textAlign='center'; ctx.fillText(rname(item.p)+' (Platzhalter)',W/2,H*.42,W*.9); ctx.textAlign='left'}
     const fs=Math.round(Math.min(W,H)*.052), pad=Math.round(W*.06);
     const og=ctx.createLinearGradient(0,H*.55,0,H); og.addColorStop(0,'rgba(0,0,0,0)'); og.addColorStop(1,'rgba(0,0,0,.65)'); ctx.fillStyle=og; ctx.fillRect(0,H*.55,W,H*.45);
-    ctx.font='700 '+fs+'px "Space Grotesk",Arial,sans-serif'; ctx.fillStyle='#fff'; ctx.textBaseline='alphabetic';
+    ctx.font='700 '+fs+'px Inter,Arial,sans-serif'; ctx.fillStyle='#fff'; ctx.textBaseline='alphabetic';
     const lines=wrap(ctx,item.sc.cap,W-pad*2);
     ctx.globalAlpha=Math.min(1,u*4); lines.forEach((ln,i)=>ctx.fillText(ln,pad,H-pad-(lines.length-1-i)*fs*1.2)); ctx.globalAlpha=1;
   }
@@ -584,8 +584,8 @@ canvas.out,video.out{display:block;width:100%;height:auto;border-radius:var(--r)
     const gr=ctx.createLinearGradient(0,0,W,H); gr.addColorStop(0,'#0b3f3c'); gr.addColorStop(1,'#0f2733'); ctx.fillStyle=gr; ctx.fillRect(0,0,W,H);
     const m=Math.min(W,H), cx=W/2; ctx.textAlign='center'; ctx.fillStyle='#fff'; ctx.globalAlpha=Math.min(1,u*3);
     ctx.font='500 '+Math.round(m*.035)+'px Inter,Arial,sans-serif'; ctx.fillText(val('f-titel'),cx,H*.36,W*.9);
-    ctx.font='700 '+Math.round(m*.07)+'px "Space Grotesk",Arial,sans-serif'; ctx.fillText(val('f-endline'),cx,H*.48,W*.9);
-    ctx.font='700 '+Math.round(m*.045)+'px "Space Grotesk",Arial,sans-serif'; ctx.fillText(val('f-preis'),cx,H*.58,W*.9);
+    ctx.font='700 '+Math.round(m*.07)+'px Inter,Arial,sans-serif'; ctx.fillText(val('f-endline'),cx,H*.48,W*.9);
+    ctx.font='700 '+Math.round(m*.045)+'px Inter,Arial,sans-serif'; ctx.fillText(val('f-preis'),cx,H*.58,W*.9);
     ctx.font='500 '+Math.round(m*.034)+'px Inter,Arial,sans-serif'; ctx.fillText(val('f-agent'),cx,H*.7,W*.9); ctx.fillText(val('f-kontakt'),cx,H*.76,W*.9);
     ctx.globalAlpha=1; ctx.textAlign='left';
   }
