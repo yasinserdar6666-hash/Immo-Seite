@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>[hidden]{display:none!important}body{margin:0}</style>
+<script>if(location.hash==='#embed')document.documentElement.classList.add('embed')</script>
 </head>
 <body>
 <title>Wohnungs-Rundgang 3D</title>
@@ -139,6 +140,13 @@ pre{border-radius:0;background:var(--surface-2)}
 .cols{gap:0 48px}
 .recov{border-radius:0}
 .sv{background:var(--stage)}
+
+/* Einbettungsmodus (#embed): nur Rundgang und Leiste, z. B. für die Startseite */
+.embed body{padding:0}
+.embed header,.embed .notice,.embed .cols,.embed .wrap>.card{display:none}
+.embed .wrap{max-width:none;gap:8px}
+.embed .bar{padding:12px 2px 10px}
+.embed .bhint{display:none}
 </style>
 
 <div class="wrap">

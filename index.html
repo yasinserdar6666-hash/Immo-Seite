@@ -77,6 +77,14 @@ a.card:hover h2,a.card:focus-visible h2{text-decoration:underline;text-underline
 footer{margin-top:40px;font-size:12px}
 @media (max-width:600px){a.card{grid-template-columns:36px minmax(0,1fr)}a.card .go{display:none}.extra{padding-left:52px}}
 .extra p{font-size:14px}
+.demo{margin-top:40px}
+.demo-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px;border-top:1px solid var(--ink);padding-top:14px;margin-bottom:14px}
+.demo-head h2{font-size:16px}
+.demo-head a{color:var(--ink);font-size:14px;text-underline-offset:4px}
+.demo iframe{display:block;width:100%;border:0;background:#fff;height:calc(min(1040px,100vw - 32px)*9/16 + 96px)}
+@media (max-width:639px){.demo iframe{height:calc((100vw - 32px)*4/3 + 120px)}}
+.demo-note{font-size:12px;color:var(--muted);margin-top:8px}
+.grid{margin-top:56px}
 </style>
 </head>
 <body>
@@ -84,6 +92,15 @@ footer{margin-top:40px;font-size:12px}
   <h1>Exposé Reel</h1>
   <p class="lead">Aus Grundriss und Fotos ein Objektvideo, ein 3D-Puppenhaus und einen begehbaren Rundgang erstellen und auf der eigenen Website einbinden. Hier sind die Prototypen zum Ausprobieren.</p>
   <p class="note">Prototyp-Stand. Die Beispielwohnung ist erfunden, es werden keine Daten gespeichert oder hochgeladen.</p>
+
+  <section class="demo" aria-label="Beispiel-Rundgang">
+    <div class="demo-head">
+      <h2>Beispiel: 3-Zimmer-Wohnung, Leipzig-Plagwitz</h2>
+      <a href="prototypes/04-rundgang-kombi.html">Vollständig öffnen →</a>
+    </div>
+    <iframe src="prototypes/04-rundgang-kombi.html#embed" title="Beispiel-Rundgang durch eine 3-Zimmer-Wohnung" allow="fullscreen"></iframe>
+    <p class="demo-note">Raum im Modell antippen oder unten wählen. Mit „Übersicht“ geht es zurück nach oben. Wohnung und Maße sind erfunden.</p>
+  </section>
 
   <div class="grid">
     <a class="card" href="prototypes/01-expose-reel-video.html">
