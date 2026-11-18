@@ -12,6 +12,17 @@ Stand: 18.11.2026. Alles hier ist Prototyp und Konzept, nichts davon ist mit ech
 4. Produktkonzept für Makler, Self-Service statt Dienstleistung ([docs/04](docs/04-produktkonzept.md)).
 5. Kosten pro Objekt und Einbindung auf Makler-Websites ([docs/05](docs/05-kosten-und-einbindung.md)).
 
+## Demo-Link
+
+Nach dem Merge veröffentlicht der Workflow `.github/workflows/pages.yml` die Prototypen bei jedem Push auf `main` unter:
+
+https://yasinserdar6666-hash.github.io/immo-seite/
+
+- `index.html` ist die Startseite mit allen vier Prototypen.
+- `einbettung-test.html` ist eine erfundene Makler-Seite, die den Kombi-Rundgang per iframe einbindet.
+
+Einmalig nötig: unter Settings → Pages bei „Source“ die Option „GitHub Actions“ wählen.
+
 ## Prototypen
 
 Die Dateien in `prototypes/` lassen sich direkt im Browser öffnen.
