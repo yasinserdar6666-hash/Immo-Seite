@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exposé Reel – Prototypen</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#f2f4f6; --surface:#ffffff; --surface-2:#e9edf1; --ink:#13202c; --muted:#546372; --line:#d3dbe2;
+  --accent:#0b6e69; --accent-ink:#ffffff; --accent-soft:#d9efed; --warn:#8a5200; --warn-soft:#fbeed8;
+  --font-d:'Space Grotesk','Helvetica Neue',Arial,sans-serif; --font-b:'Inter','Helvetica Neue',Arial,sans-serif; --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#0f161d;--surface:#17212b;--surface-2:#1f2b37;--ink:#e8eef3;--muted:#9aa9b7;--line:#2b3947;
+    --accent:#3fb8b0;--accent-ink:#06201e;--accent-soft:#143a38;--warn:#f0b35a;--warn-soft:#3a2b12;color-scheme:dark}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:16px;line-height:1.55;
+  padding:32px max(16px,env(safe-area-inset-left,0px)) 48px}
+main{max-width:960px;margin:0 auto}
+h1,h2{font-family:var(--font-d);line-height:1.2;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,5vw,40px)}
+h2{font-size:20px}
+p{margin:0}
+.lead{color:var(--muted);margin-top:10px;max-width:62ch}
+.note{margin-top:18px;background:var(--warn-soft);color:var(--warn);border-radius:var(--r);padding:10px 14px;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:28px}
+a.card{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:18px;color:inherit;text-decoration:none;transition:border-color .15s,transform .15s}
+a.card:hover,a.card:focus-visible{border-color:var(--accent);transform:translateY(-2px);outline:none}
+.num{font-family:var(--font-d);font-size:13px;color:var(--accent);font-weight:700}
+.card p{color:var(--muted);font-size:15px}
+.go{margin-top:auto;padding-top:6px;color:var(--accent);font-weight:600;font-size:14px}
+.extra{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.extra p{color:var(--muted);margin-top:6px}
+.extra a{color:var(--accent);font-weight:600}
+footer{margin-top:32px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Exposé Reel</h1>
+  <p class="lead">Aus Grundriss und Fotos ein Objektvideo, ein 3D-Puppenhaus und einen begehbaren Rundgang erstellen und auf der eigenen Website einbinden. Hier sind die Prototypen zum Ausprobieren.</p>
+  <p class="note">Prototyp-Stand. Die Beispielwohnung ist erfunden, es werden keine Daten gespeichert oder hochgeladen.</p>
+
+  <div class="grid">
+    <a class="card" href="prototypes/01-expose-reel-video.html">
+      <span class="num">01</span>
+      <h2>Objektvideo erstellen</h2>
+      <p>Grundriss hochladen, Räume anlegen, Fotos pro Raum einsortieren, Stil wählen und das Video direkt im Browser rendern.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+    <a class="card" href="prototypes/02-puppenhaus.html">
+      <span class="num">02</span>
+      <h2>3D-Puppenhaus</h2>
+      <p>Die Wohnung von oben als Modell. Räume anklicken oder den automatischen Rundgang starten.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+    <a class="card" href="prototypes/03-rundgang-streetview.html">
+      <span class="num">03</span>
+      <h2>Rundgang in Ich-Perspektive</h2>
+      <p>Wie Street View: mit Pfeilen von Raum zu Raum gehen, mit Mini-Grundriss zur Orientierung.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+    <a class="card" href="prototypes/04-rundgang-kombi.html">
+      <span class="num">04</span>
+      <h2>Kombi-Rundgang</h2>
+      <p>Puppenhaus und Ich-Perspektive in einem Fenster, 360°-Fotos pro Raum und Rundgang als Video.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+  </div>
+
+  <div class="extra">
+    <h2>So sieht es auf einer Makler-Website aus</h2>
+    <p>Eine Beispielseite bindet den Kombi-Rundgang per iframe ein, genau wie es später mit dem Einbettungs-Schnipsel funktionieren soll. <a href="einbettung-test.html">Beispielseite öffnen →</a></p>
+  </div>
+
+  <footer>Exposé Reel · Arbeitsstand, nicht mit echten Kunden getestet.</footer>
+</main>
+</body>
+</html>
