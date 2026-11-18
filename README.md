@@ -16,7 +16,7 @@ Stand: 18.11.2026. Alles hier ist Prototyp und Konzept, nichts davon ist mit ech
 
 Nach dem Merge veröffentlicht der Workflow `.github/workflows/pages.yml` die Prototypen bei jedem Push auf `main` unter:
 
-https://yasinserdar6666-hash.github.io/immo-seite/
+https://yasinserdar6666-hash.github.io/Immo-Seite/
 
 - `index.html` ist die Startseite mit allen vier Prototypen.
 - `einbettung-test.html` ist eine erfundene Makler-Seite, die den Kombi-Rundgang per iframe einbindet.
