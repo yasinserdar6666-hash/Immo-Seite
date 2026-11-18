@@ -71,6 +71,70 @@ pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-siz
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .err{padding:20px;color:var(--muted)}
 @media (max-width:639px){.hint{display:none}}
+
+/* ===== Gestaltung (B + C): flach, Haarlinien, keine Kästen, eine Schrift ===== */
+:root,:root:not([data-theme="light"]),:root[data-theme="dark"]{--bg:#ffffff;--surface:#ffffff;--surface-2:#f4f4f2;--ink:#111111;--muted:#6f6f6f;--line:#e4e4e1;
+  --accent:#111111;--accent-ink:#ffffff;--accent-soft:#f4f4f2;--stage:#f1f1ef;--warn:#7a5a22;--warn-soft:#f7f3ea;--bad:#a3271f;--r:0px;color-scheme:light}
+body{-webkit-font-smoothing:antialiased}
+header{border-bottom:1px solid var(--ink);padding-bottom:14px}
+.tag{font-size:11px;letter-spacing:.14em}
+.notice{border:0;padding:0;background:none;font-size:13px;color:var(--muted);border-radius:0}
+.card{border:0;border-top:1px solid var(--line);border-radius:0;padding:20px 0 0;background:none;box-shadow:none}
+.card h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+pre{border-radius:0;background:var(--surface-2)}
+.btn{border-radius:0;border:1px solid var(--ink);background:transparent;color:var(--ink);font-size:13px;padding:8px 14px;box-shadow:none}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn:hover{background:var(--ink);color:#fff}
+.btn.primary:hover{background:#333}
+.btn[aria-pressed="true"]{box-shadow:none}
+.lnk{font:inherit;font-size:13px;background:none;border:0;border-bottom:1px solid transparent;padding:3px 0;color:var(--muted);cursor:pointer;border-radius:0;white-space:nowrap}
+.lnk:hover,.lnk[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.lnk:focus-visible,.rooms button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* Bedienleiste unter dem Bild */
+.bar{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 24px;border-bottom:1px solid var(--line);padding:16px 0 14px}
+.bar .where{background:none;box-shadow:none;padding:0;-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:0;color:var(--ink);min-width:130px;max-width:none}
+.bar .where b{font-family:var(--font-b);font-size:16px;font-weight:600;letter-spacing:-.01em;display:block}
+.bar .where span{color:var(--muted);font-size:12px;opacity:1}
+.rooms{display:flex;flex-wrap:wrap;gap:6px 18px;list-style:none;margin:0;padding:0;font-size:13px;flex:1}
+.rooms button{font:inherit;background:none;border:0;border-bottom:1px solid transparent;padding:3px 0;color:var(--muted);cursor:pointer;white-space:nowrap}
+.rooms button small{font-size:11px;margin-left:5px;color:#9a9a9a;font-variant-numeric:tabular-nums}
+.rooms button:hover{color:var(--ink)}
+.rooms button.on{color:var(--ink);border-bottom-color:var(--ink)}
+.roomsel{display:none;font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--ink);border-radius:0;background:#fff;color:var(--ink);flex:1;min-width:0}
+.bar .btns{display:flex;gap:20px;align-items:baseline;margin-left:auto}
+@media (max-width:760px){.rooms{display:none}.roomsel{display:block}.bar .btns{margin-left:0;width:100%}}
+.bhint{font-size:12px;color:var(--muted);margin:0}
+/* Beschriftungen im Bild */
+.lbl,.go{background:#fff;box-shadow:none;border-radius:0;padding:3px 7px;font:500 11px var(--font-b);color:var(--ink);border:0;letter-spacing:.01em}
+.lbl small{display:none}
+.lbl:hover,.lbl.hl,.lbl.on,.go:hover,.go:focus-visible{background:var(--ink);color:#fff}
+.map{border:0;border-radius:0;box-shadow:none;background:rgba(255,255,255,.94);-webkit-backdrop-filter:none;backdrop-filter:none;padding:4px;right:16px;bottom:16px}
+.tourbox{display:flex;flex-direction:column;gap:0}
+.tourbox:fullscreen{background:#fff;padding:16px 24px;justify-content:center}
+.tourbox:fullscreen .sv,.tourbox:fullscreen .viewer{aspect-ratio:auto;flex:1;min-height:0}
+
+.grid{gap:32px}
+.viewer{border:0;background:var(--stage)}
+.stagecol{display:flex;flex-direction:column;gap:12px;min-width:0}
+.stagecol .bar{padding-top:4px}
+.hint{position:static;background:none;border:0;color:var(--muted);padding:0;font-size:12px;-webkit-backdrop-filter:none;backdrop-filter:none;letter-spacing:0}
+@media (max-width:639px){.hint{display:block}}
+.side{gap:28px}
+.side .card:first-child{border-top-color:var(--ink)}
+.side h2{font-size:20px;font-weight:600;letter-spacing:-.01em}
+.rl{gap:0}
+.rl button{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:10px 0;font-size:14px}
+.rl button:hover{background:none}
+.rl button:hover>span:first-child{text-decoration:underline;text-underline-offset:4px}
+.rl button.on{background:none;border-color:var(--line)}
+.rl button.on>span:first-child{text-decoration:underline;text-underline-offset:4px;font-weight:500}
+.rl .n{display:inline-block;width:28px;height:auto;border-radius:0;background:none;font-size:11px;color:var(--muted);margin:0;font-variant-numeric:tabular-nums}
+.ph{border-radius:0}
+.ph span{border-radius:0}
+.side .row .btn,#copy{border:0;border-bottom:1px solid var(--ink);padding:3px 0;background:none;color:var(--ink)}
+.side .row .btn:hover,#copy:hover{background:none;color:var(--muted)}
+.side .row{gap:20px}
 </style>
 
 <div class="wrap">
@@ -81,13 +145,16 @@ pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-siz
   <p class="notice">So könnte der interaktive Rundgang aussehen. Im Produkt kämen Räume, Maße und Reihenfolge aus dem gelesenen Grundriss, die Bilder aus dem Exposé. Hier sind Grundriss und Möbel Beispieldaten.</p>
 
   <div class="grid">
-    <div class="viewer" id="viewer">
-      <span class="hint" id="hint">Ziehen zum Drehen · Scrollen oder zwei Finger zum Zoomen · Raum antippen</span>
-      <div class="tools">
-        <button class="btn primary" id="tour">Rundgang starten</button>
-        <button class="btn" id="overview">Übersicht</button>
-        <button class="btn" id="walls" aria-pressed="false">Wände niedrig</button>
+    <div class="stagecol">
+      <div class="viewer" id="viewer"></div>
+      <div class="bar">
+        <div class="btns" style="margin-left:0">
+          <button class="btn primary" id="tour">Rundgang starten</button>
+          <button class="lnk" id="overview">Übersicht</button>
+          <button class="lnk" id="walls" aria-pressed="false">Wände ausblenden</button>
+        </div>
       </div>
+      <p class="hint" id="hint">Ziehen zum Drehen · Mausrad oder zwei Finger zum Zoomen · Raum antippen oder rechts wählen</p>
     </div>
 
     <div class="side">
@@ -291,7 +358,7 @@ pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-siz
     current=id;
     ROOMS.forEach(r=>{
       const on=r.id===id;
-      r.mesh.material.color.copy(r.base); if(on) r.mesh.material.color.lerp(new THREE.Color('#1f3550'),.35);
+      r.mesh.material.color.copy(r.base); if(on) r.mesh.material.color.lerp(new THREE.Color('#111111'),.18);
       labels[r.id].classList.toggle('on',on);
     });
     const r=ROOMS.find(x=>x.id===id);
@@ -318,7 +385,7 @@ pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-siz
 
   /* Wände niedrig */
   let wallLow=false;
-  $('walls').addEventListener('click',()=>{wallLow=!wallLow; $('walls').setAttribute('aria-pressed',String(wallLow)); buildWalls(wallLow?H_LOW:H_FULL)});
+  $('walls').addEventListener('click',()=>{wallLow=!wallLow; $('walls').setAttribute('aria-pressed',String(wallLow)); $('walls').textContent=wallLow?'Wände einblenden':'Wände ausblenden'; buildWalls(wallLow?H_LOW:H_FULL)});
 
   /* Klick auf Boden */
   const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); let down=null;

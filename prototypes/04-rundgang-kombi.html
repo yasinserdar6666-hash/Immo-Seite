@@ -86,29 +86,86 @@ pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-siz
 .sv.recording .top,.sv.recording .hint,.sv.recording .map,.sv.recording .lbl,.sv.recording .go{visibility:hidden}
 .blocker{position:absolute;inset:0;z-index:4}
 .recov[hidden],.blocker[hidden],.map[hidden]{display:none}
+
+/* ===== Gestaltung (B + C): flach, Haarlinien, keine Kästen, eine Schrift ===== */
+:root,:root:not([data-theme="light"]),:root[data-theme="dark"]{--bg:#ffffff;--surface:#ffffff;--surface-2:#f4f4f2;--ink:#111111;--muted:#6f6f6f;--line:#e4e4e1;
+  --accent:#111111;--accent-ink:#ffffff;--accent-soft:#f4f4f2;--stage:#f1f1ef;--warn:#7a5a22;--warn-soft:#f7f3ea;--bad:#a3271f;--r:0px;color-scheme:light}
+body{-webkit-font-smoothing:antialiased}
+header{border-bottom:1px solid var(--ink);padding-bottom:14px}
+.tag{font-size:11px;letter-spacing:.14em}
+.notice{border:0;padding:0;background:none;font-size:13px;color:var(--muted);border-radius:0}
+.card{border:0;border-top:1px solid var(--line);border-radius:0;padding:20px 0 0;background:none;box-shadow:none}
+.card h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+pre{border-radius:0;background:var(--surface-2)}
+.btn{border-radius:0;border:1px solid var(--ink);background:transparent;color:var(--ink);font-size:13px;padding:8px 14px;box-shadow:none}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn:hover{background:var(--ink);color:#fff}
+.btn.primary:hover{background:#333}
+.btn[aria-pressed="true"]{box-shadow:none}
+.lnk{font:inherit;font-size:13px;background:none;border:0;border-bottom:1px solid transparent;padding:3px 0;color:var(--muted);cursor:pointer;border-radius:0;white-space:nowrap}
+.lnk:hover,.lnk[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.lnk:focus-visible,.rooms button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* Bedienleiste unter dem Bild */
+.bar{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 24px;border-bottom:1px solid var(--line);padding:16px 0 14px}
+.bar .where{background:none;box-shadow:none;padding:0;-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:0;color:var(--ink);min-width:130px;max-width:none}
+.bar .where b{font-family:var(--font-b);font-size:16px;font-weight:600;letter-spacing:-.01em;display:block}
+.bar .where span{color:var(--muted);font-size:12px;opacity:1}
+.rooms{display:flex;flex-wrap:wrap;gap:6px 18px;list-style:none;margin:0;padding:0;font-size:13px;flex:1}
+.rooms button{font:inherit;background:none;border:0;border-bottom:1px solid transparent;padding:3px 0;color:var(--muted);cursor:pointer;white-space:nowrap}
+.rooms button small{font-size:11px;margin-left:5px;color:#9a9a9a;font-variant-numeric:tabular-nums}
+.rooms button:hover{color:var(--ink)}
+.rooms button.on{color:var(--ink);border-bottom-color:var(--ink)}
+.roomsel{display:none;font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--ink);border-radius:0;background:#fff;color:var(--ink);flex:1;min-width:0}
+.bar .btns{display:flex;gap:20px;align-items:baseline;margin-left:auto}
+@media (max-width:760px){.rooms{display:none}.roomsel{display:block}.bar .btns{margin-left:0;width:100%}}
+.bhint{font-size:12px;color:var(--muted);margin:0}
+/* Beschriftungen im Bild */
+.lbl,.go{background:#fff;box-shadow:none;border-radius:0;padding:3px 7px;font:500 11px var(--font-b);color:var(--ink);border:0;letter-spacing:.01em}
+.lbl small{display:none}
+.lbl:hover,.lbl.hl,.lbl.on,.go:hover,.go:focus-visible{background:var(--ink);color:#fff}
+.map{border:0;border-radius:0;box-shadow:none;background:rgba(255,255,255,.94);-webkit-backdrop-filter:none;backdrop-filter:none;padding:4px;right:16px;bottom:16px}
+.tourbox{display:flex;flex-direction:column;gap:0}
+.tourbox:fullscreen{background:#fff;padding:16px 24px;justify-content:center}
+.tourbox:fullscreen .sv,.tourbox:fullscreen .viewer{aspect-ratio:auto;flex:1;min-height:0}
+
+.wrap>.tourbox{margin-bottom:8px}
+.top{display:none}
+.hint{position:static;background:none;color:var(--muted);padding:0;max-width:none;-webkit-backdrop-filter:none;backdrop-filter:none;letter-spacing:0}
+.pr{border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;padding:10px 0}
+.plist{gap:0}
+.pr .btn,#copy,#dl{border:0;border-bottom:1px solid var(--ink);padding:3px 0;background:none;color:var(--ink);font-size:13px}
+.pr .btn:hover,#copy:hover,#dl:hover{background:none;color:var(--muted)}
+.cols{gap:0 48px}
+.recov{border-radius:0}
+.sv{background:var(--stage)}
 </style>
 
 <div class="wrap">
   <header>
-    <h1>Wohnungs-Rundgang 3D</h1>
+    <h1>Wohnungs-Rundgang</h1>
     <span class="tag">Beispiel · Puppenhaus und Ich-Perspektive</span>
   </header>
   <p class="notice">Beispielwohnung als vereinfachtes 3D-Modell. Im echten Produkt käme das Puppenhaus aus dem Grundriss und an jedem Standpunkt innen stünde ein 360°-Foto.</p>
 
+  <div class="tourbox" id="tourbox">
   <div class="sv" id="sv">
-    <div class="top">
-      <div class="where" id="where"><b>Puppenhaus</b><span>Raum antippen, um hineinzugehen</span></div>
-      <div class="btns">
-        <button class="btn" id="low" aria-pressed="false">Wände niedrig</button>
-        <button class="btn primary" id="out" hidden>Zum Puppenhaus</button>
-        <button class="btn" id="fs">Vollbild</button>
-      </div>
-    </div>
-    <p class="hint" id="hint">Ziehen zum Drehen · Zoomen mit Mausrad oder zwei Fingern · Raum antippen zum Hineingehen</p>
     <div class="map" id="mapbox" hidden><canvas id="map" width="380" height="300" aria-label="Grundriss mit Standort"></canvas></div>
     <div class="blocker" id="blocker" hidden></div>
     <div class="recov" id="recov" hidden><span id="rec-msg">Video wird aufgenommen</span><button class="btn small" id="rec-x">Abbrechen</button></div>
   </div>
+  <div class="bar">
+    <div class="where" id="where"><b>Übersicht</b><span>Raum wählen</span></div>
+    <ul class="rooms" id="rooms"></ul>
+    <select class="roomsel" id="roomsel" aria-label="Raum wählen"></select>
+    <div class="btns">
+      <button class="btn primary" id="out" hidden>Übersicht</button>
+      <button class="lnk" id="low" aria-pressed="false">Wände ausblenden</button>
+      <button class="lnk" id="fs">Vollbild</button>
+    </div>
+  </div>
+  </div>
+  <p class="bhint hint" id="hint">Ziehen zum Drehen · Zoomen mit Mausrad oder zwei Fingern · Raum antippen oder unten wählen</p>
 
   <div class="cols">
     <div class="card">
@@ -130,7 +187,7 @@ pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-siz
     <h3>Auf der eigenen Website einbinden</h3>
     <p class="sub">Jeder Rundgang bekommt eine eigene Adresse. Der Makler kopiert diesen Schnipsel in seine Objektseite, in WordPress etwa in einen „Individuelles HTML“-Block. Die Adresse unten ist ein Muster.</p>
     <pre id="snip">&lt;iframe src="https://rundgang.beispiel.de/t/3zi-plagwitz-7f2a"
-        width="100%" height="560" style="border:0;border-radius:8px"
+        width="100%" height="560" style="border:0"
         allow="fullscreen; gyroscope; accelerometer"
         loading="lazy" title="3D-Rundgang"&gt;&lt;/iframe&gt;</pre>
     <div class="row"><button class="btn" id="copy">Schnipsel kopieren</button><span class="sub" id="copy-st"></span></div>
@@ -241,7 +298,7 @@ pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-siz
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const dirOf=(y,p)=>new THREE.Vector3(Math.sin(y)*Math.cos(p),Math.sin(p),Math.cos(y)*Math.cos(p));
   const ovPos=()=>C.clone().add(new THREE.Vector3(-3,15.5,14).multiplyScalar(Math.max(1,1.12/(camera.aspect||1.5))));
-  const SKY=new THREE.Color('#bcd6ea'), STAGE=new THREE.Color('#ecebe7');
+  const SKY=new THREE.Color('#bcd6ea'), STAGE=new THREE.Color('#f1f1ef');
   function showEnv(on){envG.visible=on; scene.background=on?SKY:STAGE; scene.fog.color.copy(on?SKY:STAGE)}
   function setWhere(t,s){$('where').innerHTML='<b>'+t+'</b><span>'+s+'</span>'}
 
@@ -290,7 +347,7 @@ pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-siz
     setWhere(room(id).name,'Du gehst hinein …');
     startFly([{p:camera.position.clone(),l:controls.target.clone()},{p:above,l:floorPt},{p:eye,l:eye.clone().add(dirOf(yaw,pitch))}],2000,()=>{
       ceilG.visible=true; showEnv(true); pos.copy(eye); cur=id; mode='inside'; camera.fov=72; camera.updateProjectionMatrix();
-      sv.classList.add('inside'); $('mapbox').hidden=false; $('out').hidden=false; $('hint').textContent='Ziehen zum Umschauen · Pfeil oder Raumschild antippen zum Weitergehen · Grundriss antippen zum Springen';
+      sv.classList.add('inside'); $('mapbox').hidden=false; $('out').hidden=false; $('hint').textContent='Ziehen zum Umschauen · Pfeil, Raumname oder Grundriss antippen zum Weitergehen';
       setRoomInfo(); buildArrows(id); applyPano(); cb&&cb();
     });
     fly.onStep=t=>{ if(t>.8&&!ceilG.visible){ceilG.visible=true; showEnv(true)} camera.fov=50+22*Math.max(0,(t-.5)*2); camera.updateProjectionMatrix() };
@@ -301,10 +358,10 @@ pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-siz
     const look=pos.clone().add(dirOf(yaw,pitch)), f=dirOf(yaw,0);
     const above=pos.clone().setY(6.5).addScaledVector(f,-.6), floorPt=pos.clone().setY(0).addScaledVector(f,2.2);
     const end=ovPos(), endL=C.clone();
-    setWhere('Puppenhaus','Raum antippen, um hineinzugehen');
+    setWhere('Übersicht','Raum wählen');
     startFly([{p:pos.clone(),l:look},{p:above,l:floorPt},{p:end,l:endL}],2000,()=>{
       mode='house'; controls.target.copy(endL); controls.enabled=true; controls.update(); labels.forEach(l=>l.style.display='');
-      $('low').hidden=false; wallG.scale.y=low?.38:1; $('hint').textContent='Ziehen zum Drehen · Zoomen mit Mausrad oder zwei Fingern · Raum antippen zum Hineingehen'; cb&&cb();
+      $('low').hidden=false; wallG.scale.y=low?.38:1; $('hint').textContent='Ziehen zum Drehen · Zoomen mit Mausrad oder zwei Fingern · Raum antippen oder unten wählen'; cb&&cb();
     });
     fly.onStep=t=>{ if(t>.15&&ceilG.visible){ceilG.visible=false; showEnv(false)} camera.fov=72-22*Math.min(1,t*2); camera.updateProjectionMatrix() };
   }
@@ -350,10 +407,23 @@ pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-siz
     else if(e.key==='ArrowUp'){let best=null,bd=1; neighbours(cur).forEach(n=>{const d=Math.abs(nearAngle(yaw,Math.atan2(n.door[0]-pos.x,n.door[1]-pos.z))-yaw); if(d<bd){bd=d;best=n.to}}); if(best){walk(best);e.preventDefault()}}
     else if(e.key==='Escape') leave();
   });
-  $('out').addEventListener('click',leave);
-  $('low').addEventListener('click',()=>{low=!low; $('low').setAttribute('aria-pressed',String(low)); wallG.scale.y=low?.38:1});
-  $('fs').addEventListener('click',()=>{try{ if(document.fullscreenElement) document.exitFullscreen(); else sv.requestFullscreen().catch(()=>{$('fs').hidden=true}) }catch(e){$('fs').hidden=true}});
+  $('out').addEventListener('click',()=>leave());
+  $('low').addEventListener('click',()=>{low=!low; $('low').setAttribute('aria-pressed',String(low)); $('low').textContent=low?'Wände einblenden':'Wände ausblenden'; wallG.scale.y=low?.38:1});
+  $('fs').addEventListener('click',()=>{try{ if(document.fullscreenElement) document.exitFullscreen(); else $('tourbox').requestFullscreen().catch(()=>{$('fs').hidden=true}) }catch(e){$('fs').hidden=true}});
   if(!sv.requestFullscreen) $('fs').hidden=true;
+
+  /* Raumleiste unter dem Bild */
+  const roomsUl=$('rooms'), roomSel=$('roomsel');
+  roomsUl.innerHTML=ROOMS.map(r=>'<li><button type="button" data-id="'+r.id+'">'+r.name+'<small>'+fmt(qm(r))+' m²</small></button></li>').join('');
+  roomSel.innerHTML='<option value="">Raum wählen …</option>'+ROOMS.map(r=>'<option value="'+r.id+'">'+r.name+' · '+fmt(qm(r))+' m²</option>').join('');
+  function goRoom(id){ if(!id||REC||fly) return; if(mode==='house') enter(id); else if(mode==='inside'&&id!==cur) walk(id,true); }
+  roomsUl.addEventListener('click',e=>{const b=e.target.closest('button'); if(b) goRoom(b.dataset.id)});
+  roomSel.addEventListener('change',()=>goRoom(roomSel.value));
+  roomsUl.addEventListener('mouseover',e=>{const b=e.target.closest('button'); labels.forEach(l=>l.classList.toggle('hl',!!b&&l._r.id===b.dataset.id))});
+  roomsUl.addEventListener('mouseleave',()=>labels.forEach(l=>l.classList.remove('hl')));
+  let navCur;
+  function syncNav(){ const c=mode==='inside'?cur:null; if(c===navCur) return; navCur=c;
+    roomsUl.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.id===c)); roomSel.value=c||''; }
 
   /* ---------- Mini-Grundriss ---------- */
   const map=$('map'), mc=map.getContext('2d'), S=30, OX=25, OY=15;
@@ -510,7 +580,7 @@ pre{margin:0;background:var(--surface-2);border-radius:8px;padding:12px;font-siz
     if(REC) REC.frame(now);
     if(mode==='house') labels.forEach(l=>{ const r=l._r; project(l,new THREE.Vector3((r.x[0]+r.x[1])/2,low?1.2:.4,(r.z[0]+r.z[1])/2)) });
     if(mode==='inside'){ tags.forEach(t=>project(t,t._p)); drawMap(); }
-    requestAnimationFrame(loop);
+    syncNav(); requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
 })();

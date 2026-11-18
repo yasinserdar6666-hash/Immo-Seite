@@ -123,6 +123,42 @@ canvas.out,video.out{display:block;width:100%;height:auto;border-radius:var(--r)
 .sum{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px;margin:0}
 .sum dt{color:var(--muted)}.sum dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .hidden-step{display:none}
+
+/* ===== Gestaltung (B + C): flach, Haarlinien, keine Kästen, eine Schrift ===== */
+:root,:root:not([data-theme="light"]),:root[data-theme="dark"]{--bg:#ffffff;--surface:#ffffff;--surface-2:#f4f4f2;--ink:#111111;--muted:#6f6f6f;--line:#e4e4e1;
+  --accent:#111111;--accent-ink:#ffffff;--accent-soft:#f4f4f2;--stage:#f1f1ef;--warn:#7a5a22;--warn-soft:#f7f3ea;--bad:#a3271f;--r:0px;color-scheme:light}
+body{-webkit-font-smoothing:antialiased}
+header{border-bottom:1px solid var(--ink);padding-bottom:14px}
+.tag{font-size:11px;letter-spacing:.14em}
+.notice{border:0;padding:0;background:none;font-size:13px;color:var(--muted);border-radius:0}
+.card{border:0;border-top:1px solid var(--line);border-radius:0;padding:20px 0 0;background:none;box-shadow:none}
+.card h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+pre{border-radius:0;background:var(--surface-2)}
+.btn{border-radius:0;border:1px solid var(--ink);background:transparent;color:var(--ink);font-size:13px;padding:8px 14px;box-shadow:none}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn:hover{background:var(--ink);color:#fff}
+.btn.primary:hover{background:#333}
+.btn[aria-pressed="true"]{box-shadow:none}
+.lnk{font:inherit;font-size:13px;background:none;border:0;border-bottom:1px solid transparent;padding:3px 0;color:var(--muted);cursor:pointer;border-radius:0;white-space:nowrap}
+.lnk:hover,.lnk[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.lnk:focus-visible,.rooms button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+.layout{gap:40px}
+.panel{border:0;border-top:1px solid var(--ink);border-radius:0;padding:20px 0 0;background:none}
+.steps{gap:24px;border-bottom:1px solid var(--line)}
+.steps button{border:0;border-bottom:1px solid transparent;border-radius:0;background:none;padding:8px 0;margin-bottom:-1px}
+.steps .n{width:auto;height:auto;border-radius:0;background:none;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.steps button[aria-current="step"]{border-color:var(--ink);box-shadow:none;color:var(--ink)}
+.steps button[aria-current="step"] .n{background:none;color:var(--ink)}
+.steps button.done .n{background:none;color:var(--ink)}
+input[type=text],input[type=number],select,textarea{border-radius:0;background:#fff;border-color:#d6d6d3}
+.room{border:0;border-top:1px solid var(--line);border-radius:0;padding:14px 0;background:none}
+.thumb,.add,.floor .plan,.x,.warnbox,.warnbox button,.drop,.choice span,.scene,.ai,.stage,canvas.out,video.out,.thumb .ex,.thumb .rm,.chip,.pill{border-radius:0}
+.bar{border-radius:0;height:2px}
+.choice input:checked+span{box-shadow:none;border-color:var(--ink);background:#fff}
+.ai{border-color:var(--line);background:var(--surface-2)}
+.chip{background:var(--surface-2);color:var(--ink)}
+.x{background:#fff}
 </style>
 
 <div class="wrap">
