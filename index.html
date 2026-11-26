@@ -85,22 +85,54 @@ footer{margin-top:40px;font-size:12px}
 @media (max-width:639px){.demo iframe{height:calc((100vw - 32px)*4/3 + 120px)}}
 .demo-note{font-size:12px;color:var(--muted);margin-top:8px}
 .grid{margin-top:56px}
+.switch{display:flex;gap:24px;border-bottom:1px solid #e4e4e1;margin-bottom:14px}
+.switch button{appearance:none;background:none;border:0;padding:0 0 10px;margin-bottom:-1px;font:500 14px/1.2 inherit;font-family:inherit;color:#6f6f6f;cursor:pointer;border-bottom:1px solid transparent}
+.switch button[aria-pressed="true"]{color:#111;border-bottom-color:#111}
+.switch button:hover{color:#111}
+.demo iframe.tall{height:calc(min(1040px,100vw - 32px)*9/16 + 340px)}
+@media (max-width:639px){.demo iframe.tall{height:calc((100vw - 32px)*4/3 + 500px)}}
 </style>
 </head>
 <body>
 <main>
   <h1>Exposé Reel</h1>
   <p class="lead">Aus Grundriss und Fotos ein Objektvideo, ein 3D-Puppenhaus und einen begehbaren Rundgang erstellen und auf der eigenen Website einbinden. Hier sind die Prototypen zum Ausprobieren.</p>
-  <p class="note">Prototyp-Stand. Die Beispielwohnung ist erfunden, es werden keine Daten gespeichert oder hochgeladen.</p>
+  <p class="note">Prototyp-Stand. Es werden keine Daten gespeichert oder hochgeladen.</p>
 
   <section class="demo" aria-label="Beispiel-Rundgang">
+    <nav class="switch" aria-label="Wohnung wählen">
+      <button type="button" data-k="echt" aria-pressed="true">Echte Wohnung Nr. 10</button>
+      <button type="button" data-k="demo" aria-pressed="false">Erfundenes Beispiel</button>
+    </nav>
     <div class="demo-head">
-      <h2>Beispiel: 3-Zimmer-Wohnung, Leipzig-Plagwitz</h2>
-      <a href="prototypes/04-rundgang-kombi.html">Vollständig öffnen →</a>
+      <h2 id="demo-title">Wohnung Nr. 10, Dachgeschoss</h2>
+      <a id="demo-open" href="wohnung-10/">Vollständig öffnen →</a>
     </div>
-    <iframe src="prototypes/04-rundgang-kombi.html#embed" title="Beispiel-Rundgang durch eine 3-Zimmer-Wohnung" allow="fullscreen"></iframe>
-    <p class="demo-note">Raum im Modell antippen oder unten wählen. Mit „Übersicht“ geht es zurück nach oben. Wohnung und Maße sind erfunden.</p>
+    <iframe id="demo-frame" src="wohnung-10/" title="Rundgang durch Wohnung Nr. 10" allow="fullscreen"></iframe>
+    <p class="demo-note" id="demo-note">Echte Fotos und Grundriss aus einem Inserat. Raum im Modell antippen oder unten wählen, im Foto den Pfeilen folgen.</p>
   </section>
+  <script>
+  (function(){
+    var V={
+      echt:{t:'Wohnung Nr. 10, Dachgeschoss',src:'wohnung-10/',open:'wohnung-10/',f:'Rundgang durch Wohnung Nr. 10',tall:1,
+        n:'Echte Fotos und Grundriss aus einem Inserat. Raum im Modell antippen oder unten wählen, im Foto den Pfeilen folgen.'},
+      demo:{t:'Beispiel: 3-Zimmer-Wohnung, Leipzig-Plagwitz',src:'prototypes/04-rundgang-kombi.html#embed',open:'prototypes/04-rundgang-kombi.html',f:'Beispiel-Rundgang durch eine 3-Zimmer-Wohnung',tall:0,
+        n:'Raum im Modell antippen oder unten wählen. Mit „Übersicht“ geht es zurück nach oben. Wohnung und Maße sind erfunden.'}
+    };
+    var fr=document.getElementById('demo-frame'), bs=document.querySelectorAll('.switch button');
+    function show(k){
+      var v=V[k]; if(!v) return;
+      fr.src=v.src; fr.title=v.f; fr.classList.toggle('tall',!!v.tall);
+      var h=document.getElementById('demo-title');h.textContent=v.t;h.style.visibility=v.tall?'hidden':'';
+      document.getElementById('demo-open').href=v.open;
+      document.getElementById('demo-note').textContent=v.n;
+      bs.forEach(function(b){b.setAttribute('aria-pressed',b.dataset.k===k?'true':'false')});
+      history.replaceState(null,'',k==='demo'?'#beispiel':location.pathname);
+    }
+    bs.forEach(function(b){b.addEventListener('click',function(){show(b.dataset.k)})});
+    if(location.hash==='#beispiel') show('demo'); else{fr.classList.add('tall');document.getElementById('demo-title').style.visibility='hidden'}
+  })();
+  </script>
 
   <div class="grid">
     <a class="card" href="prototypes/01-expose-reel-video.html">
