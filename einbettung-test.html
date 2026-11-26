@@ -18,7 +18,7 @@ h1{font-size:clamp(24px,4vw,32px);margin:0 0 6px;font-weight:normal}
 .facts{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 24px;padding:0;list-style:none;font-family:Arial,sans-serif;font-size:14px}
 .facts li{background:#fff;border:1px solid #e2ddd2;border-radius:4px;padding:6px 12px}
 h2{font-size:20px;font-weight:normal;border-bottom:1px solid #e2ddd2;padding-bottom:4px;margin:28px 0 12px}
-.hint{font-family:Arial,sans-serif;font-size:13px;color:#8a5200;background:#fbeed8;border-radius:4px;padding:8px 12px;margin:0 0 12px}
+.hint{font-family:Arial,sans-serif;font-size:13px;color:#666;margin:0 0 12px}
 pre{background:#fff;border:1px solid #e2ddd2;border-radius:4px;padding:12px;overflow:auto;font-size:13px}
 </style>
 </head>
@@ -36,15 +36,15 @@ pre{background:#fff;border:1px solid #e2ddd2;border-radius:4px;padding:12px;over
 
   <h2>3D-Rundgang</h2>
   <p class="hint">Dieser Bereich ist der eingebettete Rundgang. So würde er auf der Website eines Maklers erscheinen.</p>
-  <iframe src="prototypes/04-rundgang-kombi.html"
-          width="100%" height="720" style="border:0;border-radius:8px;background:#fff"
+  <iframe src="prototypes/04-rundgang-kombi.html#embed"
+          width="100%" height="612" style="border:0;background:#fff"
           allow="fullscreen; gyroscope; accelerometer"
           loading="lazy" title="3D-Rundgang"></iframe>
 
   <h2>Einbettungs-Schnipsel</h2>
   <p>Diesen Code fügt der Makler in seine Website ein, z. B. in WordPress als Block „Individuelles HTML“. Im echten Betrieb zeigt <code>src</code> auf die Adresse des jeweiligen Rundgangs.</p>
 <pre>&lt;iframe src="https://rundgang.beispiel.de/t/3zi-plagwitz-7f2a"
-        width="100%" height="560" style="border:0;border-radius:8px"
+        width="100%" height="560" style="border:0"
         allow="fullscreen; gyroscope; accelerometer"
         loading="lazy" title="3D-Rundgang"&gt;&lt;/iframe&gt;</pre>
 </main>
