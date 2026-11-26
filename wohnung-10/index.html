@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Wohnung Nr. 10 · Rundgang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+[hidden]{display:none!important}
+:root{--ink:#111;--muted:#6f6f6f;--line:#e4e4e1;--stage:#f1f1ef;--f:'Inter','Helvetica Neue',Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  padding:20px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+p{margin:0}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--ink);padding-bottom:14px}
+h1{font-size:22px;font-weight:600;letter-spacing:-.015em;margin:0;line-height:1.2}
+.tag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.notice{font-size:13px;color:var(--muted)}
+.tourbox{display:flex;flex-direction:column}
+.tourbox:fullscreen{background:#fff;padding:16px 24px;justify-content:center}
+.tourbox:fullscreen .sv{aspect-ratio:auto;flex:1;min-height:0}
+.sv{position:relative;overflow:hidden;background:var(--stage);aspect-ratio:3/4;user-select:none;-webkit-user-select:none}
+@media (min-width:640px){.sv{aspect-ratio:16/9}}
+.sv>canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.sv>canvas.drag{cursor:grabbing}.sv>canvas.hot{cursor:pointer}
+.err{padding:20px}
+/* Raumnamen im Puppenhaus, Türschilder innen */
+.lbl,.go{position:absolute;left:0;top:0;z-index:2;cursor:pointer;white-space:nowrap;border:0;background:#fff;color:var(--ink);font:500 11px var(--f);padding:3px 7px;letter-spacing:.01em}
+.lbl:hover,.lbl.hl,.go:hover,.go:focus-visible{background:var(--ink);color:#fff}
+/* Fotoansicht */
+.photo{position:absolute;inset:0;z-index:3;overflow:hidden;background:#e9e8e4;touch-action:none;cursor:grab}
+.photo.drag{cursor:grabbing}
+.layer{position:absolute;inset:0;transform-origin:50% 50%;will-change:transform,opacity}
+.layer img{position:absolute;left:0;top:0;max-width:none;pointer-events:none;-webkit-user-drag:none}
+.spot{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:none;border:0;padding:0;cursor:pointer;font:500 11px var(--f);color:var(--ink)}
+.spot svg{width:44px;height:30px;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));transition:transform .15s}
+.spot span{background:#fff;padding:3px 7px;letter-spacing:.01em;white-space:nowrap}
+.spot:hover span,.spot:focus-visible span{background:var(--ink);color:#fff}
+.spot:hover svg{transform:translateY(-3px)}
+.spot:focus-visible{outline:none}
+.spot.back svg{transform:rotate(180deg)}
+.spot.back:hover svg{transform:rotate(180deg) translateY(-3px)}
+.hiding .spot{opacity:0;transition:opacity .15s}
+.map{position:absolute;right:16px;bottom:16px;z-index:4;background:rgba(255,255,255,.94);padding:4px}
+.map canvas{display:block;width:84px;height:auto;cursor:pointer}
+@media (max-width:639px){.map{right:8px;bottom:8px;padding:3px}}
+@media (min-width:640px){.map canvas{width:150px}}
+/* Leiste unter dem Bild */
+.bar{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 24px;border-bottom:1px solid var(--line);padding:16px 0 14px}
+.where{min-width:150px}
+.where b{font-size:16px;font-weight:600;letter-spacing:-.01em;display:block}
+.where span{color:var(--muted);font-size:12px}
+.rooms{display:flex;flex-wrap:wrap;gap:6px 18px;list-style:none;margin:0;padding:0;font-size:13px;flex:1}
+.rooms button{font:inherit;background:none;border:0;border-bottom:1px solid transparent;padding:3px 0;color:var(--muted);cursor:pointer;white-space:nowrap}
+.rooms button small{font-size:11px;margin-left:5px;color:#9a9a9a;font-variant-numeric:tabular-nums}
+.rooms button:hover{color:var(--ink)}
+.rooms button.on{color:var(--ink);border-bottom-color:var(--ink)}
+.roomsel{display:none;font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--ink);border-radius:0;background:#fff;color:var(--ink);flex:1;min-width:0}
+.btns{display:flex;gap:20px;align-items:baseline;margin-left:auto}
+.btn{font:inherit;font-size:13px;border-radius:0;border:1px solid var(--ink);background:var(--ink);color:#fff;padding:8px 14px;cursor:pointer}
+.btn:hover{background:#333}
+.lnk{font:inherit;font-size:13px;background:none;border:0;border-bottom:1px solid transparent;padding:3px 0;color:var(--muted);cursor:pointer;white-space:nowrap}
+.lnk:hover,.lnk[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.lnk:focus-visible,.rooms button:focus-visible,.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+@media (max-width:760px){.rooms{display:none}.roomsel{display:block}.btns{margin-left:0;width:100%}}
+.hint{font-size:12px;color:var(--muted)}
+.kip{border-bottom:1px solid var(--line);padding:14px 0 16px;display:flex;flex-direction:column;gap:10px;font-size:13px}
+.kip p{color:var(--muted);max-width:70ch}
+.kip .row{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:baseline}
+/* Higgsfield-Knöpfe: beim Darüberfahren eine abgerundete Fläche in Higgsfield-Farbe über Knopf, Logo und „Powered by Higgsfield“ */
+:root{--hf:#d1fe17;--hf-ink:#000}
+.hf{position:relative;display:inline-flex;align-items:baseline;margin-right:30px;isolation:isolate}
+.kip .hf{margin-right:40px}
+.hf::before{content:"";position:absolute;z-index:-1;left:-8px;right:-36px;top:-6px;bottom:-22px;background:var(--hf);border-radius:8px;opacity:0;transition:opacity .15s;pointer-events:none}
+.kip .hf::before{left:-6px;right:-44px;top:-6px;bottom:-24px}
+.hf-logo{position:absolute;left:calc(100% + 8px);top:50%;transform:translate(-4px,-50%);width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--hf-ink);opacity:0;transition:opacity .15s,transform .15s;pointer-events:none}
+.hf-logo svg{width:100%;height:100%;display:block}
+.hf-by{position:absolute;left:0;top:calc(100% + 4px);font-size:10px;letter-spacing:.02em;color:var(--hf-ink);white-space:nowrap;opacity:0;transition:opacity .15s;pointer-events:none}
+.hf:hover::before,.hf:has(:focus-visible)::before,.hf:hover .hf-logo,.hf:has(:focus-visible) .hf-logo,.hf:hover .hf-by,.hf:has(:focus-visible) .hf-by{opacity:1}
+.hf:hover .hf-logo,.hf:has(:focus-visible) .hf-logo{transform:translate(0,-50%)}
+.hf .btn{border-radius:6px}
+.hf .btn:hover,.hf .btn:focus-visible{background:transparent;border-color:var(--hf-ink);color:var(--hf-ink)}
+.hf .lnk{padding:3px 6px;margin:0 -6px;border-radius:6px}
+.hf .lnk:hover,.hf .lnk:focus-visible{background:transparent;color:var(--hf-ink);border-bottom-color:transparent}
+.hf .lnk~.hf-by{left:0}
+.kip .hf .hf-logo{width:28px;height:28px}
+@media (prefers-reduced-motion:reduce){.hf-logo,.hf-by{transition:none}}
+.kip .st{color:var(--ink)}
+.kip .st.err{color:#a3271f}
+.kip a{color:var(--ink)}
+.kip label.lnk{cursor:pointer}
+.back{position:absolute;left:16px;top:16px;z-index:5;display:inline-flex;align-items:center;gap:8px;font:500 13px var(--f);background:rgba(255,255,255,.94);color:var(--ink);border:0;padding:9px 14px;cursor:pointer}
+.back:hover{background:var(--ink);color:#fff}
+.back span{font-size:15px;line-height:1}
+.kitag{position:absolute;left:16px;top:60px;z-index:4;background:var(--ink);color:#fff;font:500 11px var(--f);padding:4px 8px;letter-spacing:.01em;pointer-events:none}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0 32px;border-top:1px solid var(--line);padding-top:16px;margin-top:8px}
+.facts div{border-bottom:1px solid var(--line);padding:8px 0;display:flex;justify-content:space-between;gap:12px;font-size:13px}
+.facts span{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Wohnung Nr. 10 · Dachgeschoss</h1>
+    <span class="tag">Übersicht und Rundgang</span>
+  </header>
+  <p class="notice">Das 3D-Modell ist aus dem Grundriss nachgebaut, die Maße sind angenähert. Innen siehst du nur die echten Fotos, nichts ist ergänzt.<span id="kihint" hidden> Auf Wunsch kann Higgsfield den Rest eines Raums per KI ergänzen, das wird dann deutlich gekennzeichnet.</span> Für die Küche gibt es noch kein Foto, dort zeigt der Rundgang das Modell.</p>
+
+  <div class="tourbox" id="tourbox">
+    <div class="sv" id="sv">
+      <button class="back" id="out" hidden><span aria-hidden="true">←</span> Puppenhaus</button>
+      <div class="kitag" id="kitag" hidden>KI-Ergänzung · echt ist nur das Foto</div>
+      <div class="map" id="mapbox" hidden><canvas id="map" width="260" height="310" aria-label="Grundriss mit Standort"></canvas></div>
+    </div>
+    <div class="bar">
+      <div class="where" id="where"><b>Übersicht</b><span>Raum wählen</span></div>
+      <ul class="rooms" id="rooms"></ul>
+      <select class="roomsel" id="roomsel" aria-label="Raum wählen"></select>
+      <div class="btns">
+        <span class="hf" id="kiwrap" hidden><button class="lnk" id="ki" aria-expanded="false">Rest per KI ergänzen</button><span class="hf-logo" aria-hidden="true"><svg viewBox="60 70 400 380" aria-hidden="true"><path fill="currentColor" d="M419.055 253.911L418.753 250.505C415.893 217.823 395.28 156.334 338.099 156.334C295.668 156.334 263.614 199.548 235.326 237.647C212.754 268.158 193.196 294.333 171.676 294.333C165.956 293.715 158.585 290.771 154.073 284.112C150.009 278.069 148.957 270.326 151.062 261.032C154.37 246.318 173.332 232.688 193.343 218.129C204.325 210.386 215.613 202.176 223.438 194.278C246.011 171.82 257.446 155.557 257.446 129.383C257.446 103.21 243.453 90.1964 231.716 84.6198C208.242 73.471 173.785 79.9756 151.817 99.4937C148.508 102.593 145.195 105.532 142.185 108.32C120.065 128.611 105.17 142.397 71.0117 131.861V174.298C116.304 194.899 154.375 155.557 168.821 137.437C179.954 125.512 191.691 118.541 200.421 118.541H200.874C204.787 118.696 208.095 120.246 210.506 123.034C214.419 127.683 215.924 133.104 215.169 139.142C213.513 151.845 200.723 166.71 177.249 182.974C149.712 202.025 103.669 233.931 100.055 274.046C97.3457 302.857 111.792 331.664 134.364 342.813C187.028 368.523 219.082 324.227 253.085 277.452C279.117 241.364 303.795 207.136 338.103 207.136C368.949 207.136 380.385 233.465 380.385 250.039V253.294L377.375 253.911C302.591 267.542 261.812 339.718 261.812 373.016C261.812 406.317 289.198 434.817 322.903 434.817C362.328 434.817 411.079 400.122 418.905 302.546L419.207 298.986H450.354V253.915L419.055 253.911ZM378.276 303.936C372.259 362.326 343.215 389.588 325.611 389.588C317.636 389.588 306.504 382.771 306.504 370.073C306.504 355.826 327.117 312.612 373.462 299.758L378.879 298.364L378.276 303.936Z"/></svg></span><small class="hf-by">Powered by Higgsfield</small></span>
+        <button class="lnk" id="low" aria-pressed="false">Wände ausblenden</button>
+        <button class="lnk" id="fs">Vollbild</button>
+      </div>
+    </div>
+    <div class="kip" id="kip" hidden>
+      <p id="kitxt">Higgsfield erzeugt für diesen Raum ein 360°-Bild, das zeigt, wie der Rest des Raums aussehen könnte. Das echte Foto bleibt obenauf, alles drumherum ist dann KI und wird so gekennzeichnet. Kostet Higgsfield-Credits und dauert etwa eine Minute.</p>
+      <div class="row">
+        <span class="hf"><button class="btn" id="kigo">Mit Higgsfield erzeugen</button><span class="hf-logo" aria-hidden="true"><svg viewBox="60 70 400 380" aria-hidden="true"><path fill="currentColor" d="M419.055 253.911L418.753 250.505C415.893 217.823 395.28 156.334 338.099 156.334C295.668 156.334 263.614 199.548 235.326 237.647C212.754 268.158 193.196 294.333 171.676 294.333C165.956 293.715 158.585 290.771 154.073 284.112C150.009 278.069 148.957 270.326 151.062 261.032C154.37 246.318 173.332 232.688 193.343 218.129C204.325 210.386 215.613 202.176 223.438 194.278C246.011 171.82 257.446 155.557 257.446 129.383C257.446 103.21 243.453 90.1964 231.716 84.6198C208.242 73.471 173.785 79.9756 151.817 99.4937C148.508 102.593 145.195 105.532 142.185 108.32C120.065 128.611 105.17 142.397 71.0117 131.861V174.298C116.304 194.899 154.375 155.557 168.821 137.437C179.954 125.512 191.691 118.541 200.421 118.541H200.874C204.787 118.696 208.095 120.246 210.506 123.034C214.419 127.683 215.924 133.104 215.169 139.142C213.513 151.845 200.723 166.71 177.249 182.974C149.712 202.025 103.669 233.931 100.055 274.046C97.3457 302.857 111.792 331.664 134.364 342.813C187.028 368.523 219.082 324.227 253.085 277.452C279.117 241.364 303.795 207.136 338.103 207.136C368.949 207.136 380.385 233.465 380.385 250.039V253.294L377.375 253.911C302.591 267.542 261.812 339.718 261.812 373.016C261.812 406.317 289.198 434.817 322.903 434.817C362.328 434.817 411.079 400.122 418.905 302.546L419.207 298.986H450.354V253.915L419.055 253.911ZM378.276 303.936C372.259 362.326 343.215 389.588 325.611 389.588C317.636 389.588 306.504 382.771 306.504 370.073C306.504 355.826 327.117 312.612 373.462 299.758L378.879 298.364L378.276 303.936Z"/></svg></span><small class="hf-by">Powered by Higgsfield</small></span>
+        <a id="kires" href="#" target="_blank" rel="noopener" hidden>Ergebnis bei Higgsfield öffnen</a>
+        <label class="lnk">Fertiges 360°-Bild einsetzen<input type="file" id="kifile" accept="image/jpeg,image/png,image/webp" hidden></label>
+        <button class="lnk" id="kioff" hidden aria-pressed="true">KI-Ergänzung ausblenden</button>
+      </div>
+      <p class="st" id="kist" role="status"></p>
+    </div>
+  </div>
+  <p class="hint" id="hint">Ziehen zum Drehen · Zoomen mit Mausrad oder zwei Fingern · Raum antippen oder unten wählen</p>
+
+  <div class="facts" id="facts"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+  if(window.claude&&window.claude.use){const k=document.getElementById('kihint');if(k)k.hidden=false}
+  if(!window.THREE||!THREE.OrbitControls){document.getElementById('sv').insertAdjacentHTML('afterbegin','<p class="err">Die 3D-Ansicht konnte nicht geladen werden.</p>');return}
+  const PI=Math.PI;
+  /* ---------- Grundriss Wohnung Nr. 10 (Meter, x = Osten, z = Süden) ---------- */
+  const LAM='#cdb08a';
+  const ROOMS=[
+    {id:'flur',  name:'Flur',   qm:5.07,  x:[0,3.55],   z:[3.2,4.7], floor:LAM},
+    {id:'bad',   name:'Bad',    qm:4.22,  x:[0,1.5],    z:[0,3.2],   floor:'#e6e8e8'},
+    {id:'kueche',name:'Küche',  qm:5.97,  x:[1.5,3.55], z:[0,3.2],   floor:'#d9d6cf'},
+    {id:'z10',   name:'Zimmer', qm:10.19, x:[3.55,5.8], z:[0,4.7],   floor:LAM},
+    {id:'z14',   name:'Zimmer', qm:14.16, x:[-1.4,1.75],z:[4.7,9.1], floor:LAM},
+    {id:'z16',   name:'Zimmer', qm:16.72, x:[1.75,5.8], z:[4.7,9.1], floor:LAM}
+  ];
+  const DOORS=[{l:'x',c:0,a:3.5,b:4.4},{l:'z',c:3.2,a:.45,b:1.2},{l:'z',c:3.2,a:2.0,b:2.8},{l:'x',c:3.55,a:3.55,b:4.45},
+    {l:'z',c:4.7,a:.35,b:1.1},{l:'z',c:4.7,a:2.55,b:3.35}];
+  const WINDOWS=[{l:'z',c:0,a:.35,b:1.1},{l:'z',c:0,a:2.15,b:2.95},{l:'z',c:0,a:4.2,b:5.15},
+    {l:'z',c:9.1,a:-.95,b:-.15},{l:'z',c:9.1,a:.45,b:1.25},{l:'z',c:9.1,a:2.75,b:3.6},{l:'z',c:9.1,a:4.1,b:4.95}];
+  // Standpunkte (bei Räumen mit Foto: Kameraposition und Blickrichtung des Fotos, geschätzt)
+  const NODES={flur:[.6,3.95,PI/2],bad:[.75,2.9,PI],kueche:[2.95,1.7,-.35],z10:[4.7,.6,0],z14:[.15,5.15,0],z16:[5.35,5.2,-1.3]};
+  const LINKS=[['flur','bad',[.82,3.2]],['flur','kueche',[2.4,3.2]],['flur','z10',[3.55,4.0]],['flur','z14',[.72,4.7]],['flur','z16',[2.95,4.7]]];
+  // Fotos und Durchgänge im Foto (Bildkoordinaten 0–1)
+  const PH={
+    flur:{src:'img/flur.jpg',hots:[{to:'bad',x:.29,y:.62},{to:'kueche',x:.445,y:.55},{to:'z10',x:.525,y:.5},{to:'z16',x:.615,y:.55},{to:'z14',x:.70,y:.62}]},
+    z16:{src:'img/zimmer16.jpg',hots:[{to:'flur',x:.5,y:.9,back:1}]},
+    z10:{src:'img/zimmer10.jpg',hots:[{to:'flur',x:.33,y:.6}]},
+    z14:{src:'img/zimmer14.jpg',hots:[{to:'flur',x:.5,y:.9,back:1}]},
+    bad:{src:'img/bad.jpg',hots:[{to:'flur',x:.5,y:.9,back:1}]}
+  };
+  const H=2.55, T=.12, EYE=1.55, C=new THREE.Vector3(2.2,0,4.55);
+  const fmt=n=>n.toFixed(2).replace('.',',');
+  const $=id=>document.getElementById(id);
+  const room=id=>ROOMS.find(r=>r.id===id);
+  const full=r=>r.name+(r.name==='Zimmer'?' '+fmt(r.qm)+' m²':'');
+  const neighbours=id=>LINKS.filter(l=>l[0]===id||l[1]===id).map(l=>({to:l[0]===id?l[1]:l[0],door:l[2]}));
+  const sv=$('sv');
+  Object.values(PH).forEach(p=>{const i=new Image(); i.src=p.src; p.img=i});
+
+  /* ---------- Szene ---------- */
+  const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  sv.prepend(renderer.domElement);
+  const cv=renderer.domElement;
+  const scene=new THREE.Scene(); const SKY=new THREE.Color('#cfe0ec'), STAGE=new THREE.Color('#f1f1ef');
+  scene.background=STAGE.clone(); scene.fog=new THREE.Fog(STAGE.clone(),35,110);
+  const camera=new THREE.PerspectiveCamera(50,1,.05,300); camera.rotation.order='YXZ';
+  const controls=new THREE.OrbitControls(camera,cv);
+  controls.enableDamping=true; controls.maxPolarAngle=PI*.47; controls.minDistance=4; controls.maxDistance=28; controls.enablePan=false;
+  scene.add(new THREE.HemisphereLight(0xffffff,0x8a7f74,.62));
+  const sun=new THREE.DirectionalLight(0xfff3e0,.45); sun.position.set(-8,25,20); scene.add(sun);
+
+  const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.9});
+  const G=n=>{const g=new THREE.Group(); g.name=n; scene.add(g); return g};
+  const envG=G('env'), floorG=G('floor'), ceilG=G('ceil'), wallG=G('wall'), furnG=G('furn'), fixG=G('fix');
+  const box=(p,w,h,d,x,y,z,m)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m); o.position.set(x,y,z); p.add(o); return o};
+
+  // Umgebung (nur innen sichtbar): Nachbardächer
+  const yard=new THREE.Mesh(new THREE.PlaneGeometry(240,240),mat('#9aa58f')); yard.rotation.x=-PI/2; yard.position.y=-12; envG.add(yard);
+  [[-12,-10,8,12,10],[16,-6,10,12,14],[2,22,26,12,8],[-16,18,10,12,10],[14,-24,22,12,10]].forEach(([x,z,w,h,d],i)=>{
+    box(envG,w,h,d,x,-12+h/2,z,mat(['#e6ddd0','#d9dde0','#ece3d3'][i%3])); box(envG,w+.6,1.6,d+.6,x,-12+h+.8,z,mat('#b4644a'))});
+  const slabM=mat('#cfc9c0'); ROOMS.forEach(r=>box(floorG,r.x[1]-r.x[0]+T,.3,r.z[1]-r.z[0]+T,(r.x[0]+r.x[1])/2,-.17,(r.z[0]+r.z[1])/2,slabM));
+
+  // Böden: Laminat wie auf den Fotos, Fliesen im Bad
+  function texCanvas(draw){const c=document.createElement('canvas'); c.width=c.height=512; draw(c.getContext('2d')); const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.anisotropy=4; return t}
+  let seed=7; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const lamTex=texCanvas(g=>{ for(let r=0;r<8;r++){ let x=-rnd()*200; while(x<512){ const L=180+rnd()*200, k=rnd();
+      g.fillStyle='hsl('+(31+k*3)+','+(44+k*6)+'%,'+(66+k*5)+'%)'; g.fillRect(x,r*64,L,64);
+      for(let i=0;i<10;i++){g.strokeStyle='rgba(120,80,40,'+(.05+rnd()*.07)+')'; g.lineWidth=1+rnd()*2; g.beginPath(); const yy=r*64+rnd()*64; g.moveTo(x,yy); g.bezierCurveTo(x+L*.3,yy+rnd()*8-4,x+L*.6,yy+rnd()*8-4,x+L,yy); g.stroke()}
+      g.fillStyle='rgba(90,60,30,.35)'; g.fillRect(x,r*64,2,64); x+=L } g.fillStyle='rgba(90,60,30,.3)'; g.fillRect(0,r*64,512,2) } });
+  const tileTex=texCanvas(g=>{ g.fillStyle='#eef0f0'; g.fillRect(0,0,512,512); g.strokeStyle='#c9cdcf'; g.lineWidth=3; for(let i=-512;i<1024;i+=128){g.beginPath();g.moveTo(i,0);g.lineTo(i+512,512);g.stroke();g.beginPath();g.moveTo(i,512);g.lineTo(i+512,0);g.stroke()} });
+  function floorMat(r){ const w=r.x[1]-r.x[0], d=r.z[1]-r.z[0];
+    if(r.floor===LAM){const t=lamTex.clone(); t.needsUpdate=true; t.rotation=PI/2; t.repeat.set(d/2.4,w/2.4); return new THREE.MeshStandardMaterial({map:t,roughness:.75})}
+    if(r.id==='bad'){const t=tileTex.clone(); t.needsUpdate=true; t.repeat.set(w/1.2,d/1.2); return new THREE.MeshStandardMaterial({map:t,roughness:.4})}
+    return mat(r.floor) }
+  const inLight=new THREE.AmbientLight(0xfffaf4,.2); inLight.visible=false; scene.add(inLight);
+  // Böden, Decken, Licht
+  ROOMS.forEach(r=>{
+    const w=r.x[1]-r.x[0], d=r.z[1]-r.z[0], cx=(r.x[0]+r.x[1])/2, cz=(r.z[0]+r.z[1])/2;
+    const f=box(floorG,w,.02,d,cx,.01,cz,floorMat(r)); f.userData.room=r.id;
+    box(ceilG,w,.02,d,cx,H,cz,new THREE.MeshBasicMaterial({color:'#efece6'}));
+    const l=new THREE.PointLight(0xfffaf2,.22,7,1.8); l.position.set(cx,H-.3,cz); scene.add(l);
+  });
+
+  // Wände mit Türen und Fenstern
+  const wallM=mat('#f6f4f0'), glassM=new THREE.MeshStandardMaterial({color:'#a9cfe3',transparent:true,opacity:.22,roughness:.1}), frameM=mat('#ffffff');
+  const on=(list,l,c,lo,hi)=>list.filter(o=>o.l===l&&Math.abs(o.c-c)<1e-6&&o.a<hi-1e-6&&o.b>lo+1e-6);
+  function cut(lo,hi,ops){let s=[[lo,hi]]; ops.forEach(o=>{s=s.flatMap(([p,q])=>o.b<=p||o.a>=q?[[p,q]]:[[p,Math.max(p,o.a)],[Math.min(q,o.b),q]].filter(([u,v])=>v-u>.02))}); return s}
+  const seen=new Set();
+  function piece(alongX,c,a,b,y0,y1,m){const L=b-a, h=y1-y0; if(alongX) box(wallG,L+T,h,T,(a+b)/2,y0+h/2,c,m); else box(wallG,T,h,L+T,c,y0+h/2,(a+b)/2,m)}
+  function edge(alongX,c,lo,hi){
+    const k=(alongX?'z':'x')+c.toFixed(2)+':'+lo.toFixed(2)+'-'+hi.toFixed(2); if(seen.has(k)) return; seen.add(k);
+    const l=alongX?'z':'x', ds=on(DOORS,l,c,lo,hi), ws=on(WINDOWS,l,c,lo,hi);
+    cut(lo,hi,ds.concat(ws)).forEach(([a,b])=>piece(alongX,c,a,b,0,H,wallM));
+    ds.forEach(d=>piece(alongX,c,Math.max(lo,d.a),Math.min(hi,d.b),2.05,H,wallM));
+    ws.forEach(w=>{const a=Math.max(lo,w.a),b=Math.min(hi,w.b); piece(alongX,c,a,b,0,.85,wallM); piece(alongX,c,a,b,2.25,H,wallM); piece(alongX,c,a,b,.85,2.25,glassM); piece(alongX,c,a,b,.83,.87,frameM)});
+  }
+  ROOMS.forEach(r=>{const [x0,x1]=r.x,[z0,z1]=r.z; edge(true,z0,x0,x1); edge(true,z1,x0,x1); edge(false,x0,z0,z1); edge(false,x1,z0,z1)});
+  box(wallG,.05,2.03,.9,0,1.03,3.95,mat('#dcbb90')); box(wallG,.08,.04,.14,.06,1.05,4.3,mat('#b8b8b8'));
+  const capM=mat('#2c3540');
+  wallG.children.slice().forEach(m=>{ if(m.material===wallM&&m.position.y+m.geometry.parameters.height/2>H-.01){ const p=m.geometry.parameters; box(wallG,p.width+.002,.02,p.depth+.002,m.position.x,H+.01,m.position.z,capM) } });
+
+  // Einrichtung wie im Grundriss angedeutet
+  let FG=fixG; const F=(x,z,w,d,h,c,y)=>box(FG,w,h,d,x+w/2,(y||0)+h/2+.02,z+d/2,mat(c));
+  // Bad
+  F(.82,.95,.62,1.65,.55,'#ffffff'); F(.95,.12,.38,.55,.42,'#ffffff'); F(.08,1.0,.42,.55,.82,'#ffffff'); F(.06,2.2,.08,.5,.6,'#f4f4f4',.1);
+  // Küche
+  F(1.6,.12,.62,2.3,.88,'#f3f1ec'); F(1.6,.12,.62,2.3,.04,'#4a4f55',.88); F(1.62,.5,.5,.5,.02,'#222',.92);
+  FG=furnG;
+  // Zimmer 10,19
+  F(4.85,.5,.9,2.0,.45,'#efece6'); F(4.85,.5,.9,.6,.12,'#ffffff',.45); F(4.85,2.6,.9,.12,.8,'#c4a37f'); F(5.2,3.8,.55,.6,.75,'#c4a37f');
+  // Zimmer 14,16
+  F(-1.33,6.9,.9,2.0,.45,'#efece6'); F(-1.33,8.3,.9,.6,.12,'#ffffff',.45); F(-1.33,5.0,.55,1.1,.75,'#c4a37f'); F(1.12,6.3,.55,2.0,1.7,'#e6d6bd'); F(-.6,7.0,1.4,1.4,.01,'#e9e4da');
+  // Zimmer 16,72
+  F(1.82,5.0,.6,3.4,1.7,'#e6d6bd'); F(3.05,6.9,1.8,2.0,.45,'#ffffff'); F(3.05,8.3,1.8,.6,.14,'#f3f1ec',.45); F(3.05,8.95,1.8,.1,.9,'#c4a37f');
+  F(2.75,6.3,2.4,2.7,.01,'#e9e4da'); F(2.55,8.4,.45,.4,.5,'#c4a37f'); F(4.95,8.4,.45,.4,.5,'#c4a37f'); F(5.3,5.6,.4,1.0,.75,'#ffffff');
+
+  /* ---------- Zustand ---------- */
+  let mode='house', cur=null, yaw=0, pitch=-.08, low=false, fly=null, walkA=null;
+  const pos=new THREE.Vector3();
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dirOf=(y,p)=>new THREE.Vector3(Math.sin(y)*Math.cos(p),Math.sin(p),Math.cos(y)*Math.cos(p));
+  const ovPos=()=>C.clone().add(new THREE.Vector3(-2.2,12,11).multiplyScalar(Math.max(1,1.1/(camera.aspect||1.5))));
+  function showEnv(o){envG.visible=o; inLight.visible=o; furnG.visible=!o; scene.background.copy(o?SKY:STAGE); scene.fog.color.copy(o?SKY:STAGE)}
+  function setWhere(t,s){$('where').innerHTML='<b>'+t+'</b><span>'+s+'</span>'}
+  function setRoomInfo(){const r=room(cur); setWhere(full(r),fmt(r.qm)+' m²'+(PH[cur]?'':' · noch kein Foto, 3D-Modell'))}
+
+  /* Beschriftungen im Puppenhaus */
+  const labels=ROOMS.map(r=>{const b=document.createElement('button'); b.type='button'; b.className='lbl';
+    b.textContent=r.name==='Zimmer'?fmt(r.qm)+' m²':r.name; b.addEventListener('click',()=>enter(r.id)); sv.appendChild(b); b._r=r; return b});
+
+  /* Pfeile im 3D-Modell (Raum ohne Foto) */
+  const arrowShape=new THREE.Shape(); [[0,.42],[.32,0],[.12,0],[.12,-.3],[-.12,-.3],[-.12,0],[-.32,0],[0,.42]].forEach(([x,y],i)=>i?arrowShape.lineTo(x,y):arrowShape.moveTo(x,y));
+  const arrowGeo=new THREE.ShapeGeometry(arrowShape), ringGeo=new THREE.RingGeometry(.4,.48,40);
+  let arrows=[], tags=[];
+  function clearArrows(){arrows.forEach(a=>scene.remove(a)); tags.forEach(t=>t.remove()); arrows=[]; tags=[]; if(typeof clearSpots==='function') clearSpots()}
+  function buildArrows(id){
+    clearArrows(); const covered=buildSpots(id); const [nx,nz]=NODES[id];
+    neighbours(id).filter(n=>!covered.has(n.to)).forEach(n=>{
+      const dx=n.door[0]-nx, dz=n.door[1]-nz, len=Math.hypot(dx,dz), ux=dx/len, uz=dz/len, dist=Math.max(.6,Math.min(1.4,len-.35));
+      const grp=new THREE.Group(); grp.position.set(nx+ux*dist,.03,nz+uz*dist);
+      const ring=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.75,depthWrite:false,depthTest:false})); ring.renderOrder=20; ring.rotation.x=-PI/2; grp.add(ring);
+      const ar=new THREE.Mesh(arrowGeo,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.95,depthWrite:false,depthTest:false})); ar.renderOrder=21; ar.rotation.x=-PI/2; ar.position.y=.005;
+      const holder=new THREE.Group(); holder.rotation.y=Math.atan2(ux,uz)+PI; holder.add(ar); grp.add(holder);
+      ring.userData.to=n.to; ar.userData.to=n.to; scene.add(grp); arrows.push(grp);
+      const t=document.createElement('button'); t.className='go'; t.type='button'; t.textContent=full(room(n.to)); t.addEventListener('click',()=>walk(n.to));
+      t._p=new THREE.Vector3(n.door[0],1.75,n.door[1]); sv.appendChild(t); tags.push(t);
+    });
+  }
+
+  /* ---------- Kamerafahrten ---------- */
+  function startFly(pts,dur,done){ fly={pts,t0:performance.now(),dur:reduce?1:dur,done}; }
+  const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  const tmpL=new THREE.Vector3();
+  function stepFly(now){
+    const t=Math.max(0,Math.min(1,(now-fly.t0)/fly.dur)), n=fly.pts.length-1, s=Math.min(n-1,Math.floor(t*n)), u=ease(t*n-s);
+    const a=fly.pts[s], b=fly.pts[s+1];
+    camera.position.lerpVectors(a.p,b.p,u); tmpL.lerpVectors(a.l,b.l,u); camera.lookAt(tmpL);
+    if(fly.onStep) fly.onStep(t);
+    if(t>=1){const d=fly.done; fly=null; d&&d()}
+  }
+  function enter(id){
+    if(fly||mode!=='house') return;
+    const [nx,nz,ny]=NODES[id]; yaw=ny; pitch=-.08;
+    const f=dirOf(yaw,0);
+    const eye=new THREE.Vector3(nx,EYE,nz), above=new THREE.Vector3(nx,6.5,nz).addScaledVector(f,-.6);
+    const floorPt=new THREE.Vector3(nx,0,nz).addScaledVector(f,2.2);
+    mode='fly'; controls.enabled=false; labels.forEach(l=>l.style.display='none'); wallG.scale.y=1; $('low').hidden=true;
+    setWhere(full(room(id)),'Du gehst hinein …');
+    startFly([{p:camera.position.clone(),l:controls.target.clone()},{p:above,l:floorPt},{p:eye,l:eye.clone().add(dirOf(yaw,pitch))}],1900,()=>{
+      ceilG.visible=true; showEnv(true); pos.copy(eye); cur=id; mode='inside'; camera.fov=56; camera.updateProjectionMatrix();
+      $('mapbox').hidden=false; $('out').hidden=false;
+      arrive(id,true);
+    });
+    fly.onStep=t=>{ if(t>.8&&!ceilG.visible){ceilG.visible=true; showEnv(true)} camera.fov=50+6*Math.max(0,(t-.5)*2); camera.updateProjectionMatrix() };
+  }
+  function leave(){
+    if(fly||mode!=='inside'||walkA) return;
+    const go=()=>{
+      clearArrows(); mode='fly'; $('mapbox').hidden=true; $('out').hidden=true;
+      const look=pos.clone().add(dirOf(yaw,pitch)), f=dirOf(yaw,0);
+      const above=pos.clone().setY(6.5).addScaledVector(f,-.6), floorPt=pos.clone().setY(0).addScaledVector(f,2.2);
+      const end=ovPos(), endL=C.clone();
+      setWhere('Übersicht','Raum wählen');
+      startFly([{p:pos.clone(),l:look},{p:above,l:floorPt},{p:end,l:endL}],1900,()=>{
+        mode='house'; controls.target.copy(endL); controls.enabled=true; controls.update(); labels.forEach(l=>l.style.display='');
+        $('low').hidden=false; wallG.scale.y=low?.38:1; setHint();
+      });
+      fly.onStep=t=>{ if(t>.15&&ceilG.visible){ceilG.visible=false; showEnv(false)} camera.fov=56-6*Math.min(1,t*2); camera.updateProjectionMatrix() };
+    };
+    clearArrows(); hidePhoto(300,go); if(sphere.visible){ sphere.visible=false; modelVisible(true) } $('kitag').hidden=true; $('kiwrap').hidden=true; $('kip').hidden=true;
+  }
+  function setHint(){
+    $('hint').textContent=mode==='house'?'Ziehen zum Drehen · Zoomen mit Mausrad oder zwei Fingern · Raum antippen oder unten wählen'
+      :photoOn?'Ziehen zum Umschauen im Foto · Zoomen mit Mausrad · Pfeil antippen zum Weitergehen'
+      :'Ziehen zum Umschauen · Pfeil oder Raumname antippen zum Weitergehen';
+  }
+  // Ankommen in einem Raum: Foto im Modell einblenden, Pfeile zu den Nachbarräumen
+  function arrive(id,keepYaw){
+    cur=id; const n=NODES[id]; pos.set(n[0],EYE,n[1]); if(!keepYaw){yaw=n[2]; pitch=-.08}
+    setRoomInfo(); if(PH[id]) showPhoto(id); buildArrows(id); setHint(); syncKi();
+  }
+
+  /* Gehen im 3D-Modell */
+  function nearAngle(from,to){let d=to-from; while(d>PI)d-=2*PI; while(d<-PI)d+=2*PI; return from+d}
+  function walk(to,jump){
+    if(mode!=='inside'||walkA||to===cur) return;
+    const link=neighbours(cur).find(n=>n.to===to);
+    clearArrows(); hidePhoto(250); if(sphere.visible){ sphere.visible=false; modelVisible(true); $('kitag').hidden=true }
+    if(jump||!link||reduce){ arrive(to); return; }
+    const end=new THREE.Vector3(NODES[to][0],EYE,NODES[to][1]), door=new THREE.Vector3(link.door[0],EYE,link.door[1]);
+    const y1=nearAngle(yaw,Math.atan2(door.x-pos.x,door.z-pos.z));
+    const yEnd=PH[to]?nearAngle(y1,NODES[to][2]):nearAngle(y1,Math.atan2(end.x-door.x,end.z-door.z));
+    walkA={pts:[pos.clone(),door,end],t0:performance.now(),dur:1600,y0:yaw,y1,y2:yEnd,to};
+  }
+
+  /* ---------- Fotos im 3D-Raum: frei drehbar ----------
+     Jedes Foto hängt als Bildebene in seiner Aufnahmerichtung vor dem Standpunkt, mit weichem Rand.
+     Dreht man sich weg, sieht man den Raum als 3D-Modell weiter. Nichts davon ist KI-generiert. */
+  const PFOV=78*PI/180, PD=1.0;
+  let photoOn=false, photoMesh=null, pfade=null;
+  function feathered(img){
+    const W=img.naturalWidth, Hh=img.naturalHeight, c=document.createElement('canvas'); c.width=W; c.height=Hh; const g=c.getContext('2d');
+    const m=document.createElement('canvas'); m.width=W; m.height=Hh; const mg=m.getContext('2d'), f=.08;
+    const grad=(x1,y1)=>{const gr=mg.createLinearGradient(0,0,x1,y1); gr.addColorStop(0,'rgba(0,0,0,0)'); gr.addColorStop(f,'#000'); gr.addColorStop(1-f,'#000'); gr.addColorStop(1,'rgba(0,0,0,0)'); return gr};
+    mg.fillStyle=grad(W,0); mg.fillRect(0,0,W,Hh); mg.globalCompositeOperation='destination-in'; mg.fillStyle=grad(0,Hh); mg.fillRect(0,0,W,Hh);
+    g.drawImage(img,0,0); g.globalCompositeOperation='destination-in'; g.drawImage(m,0,0);
+    const t=new THREE.CanvasTexture(c); t.minFilter=THREE.LinearFilter; return t;
+  }
+  const basis=y=>({f:new THREE.Vector3(Math.sin(y),0,Math.cos(y)),r:new THREE.Vector3(-Math.cos(y),0,Math.sin(y)),u:new THREE.Vector3(0,1,0)});
+  function photoPoint(id,x,y){ const n=NODES[id], p=PH[id], b=basis(n[2]), w=2*PD*Math.tan(PFOV/2), h=w/p.ratio;
+    return new THREE.Vector3(n[0],EYE,n[1]).addScaledVector(b.f,PD).addScaledVector(b.r,(x-.5)*w).addScaledVector(b.u,(.5-y)*h) }
+  function meshFor(id){
+    const p=PH[id]; if(p.mesh) return p.mesh;
+    p.ratio=p.img.naturalWidth/p.img.naturalHeight; const w=2*PD*Math.tan(PFOV/2);
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w/p.ratio),new THREE.MeshBasicMaterial({map:null,transparent:true,opacity:0,depthTest:false,depthWrite:false,fog:false}));
+    p.texSoft=feathered(p.img); p.texPlain=new THREE.Texture(p.img); p.texPlain.minFilter=THREE.LinearFilter; p.texPlain.needsUpdate=true; m.material.map=p.texPlain;
+    m.renderOrder=10; m.position.copy(photoPoint(id,.5,.5)); m.rotation.y=NODES[id][2]+PI; m.visible=false; scene.add(m); p.mesh=m; return m;
+  }
+  function fadeTo(m,to,dur,done){ if(!m) {done&&done(); return;} m.visible=true; pfade={m,from:m.material.opacity,to,t0:performance.now(),dur:reduce?1:dur,done} }
+  function showPhoto(id){
+    const p=PH[id], go=()=>{ if(cur!==id||mode!=='inside') return; const m=meshFor(id); photoMesh=m; photoOn=true; setHint(); fadeTo(m,1,550) };
+    if(p.img.complete&&p.img.naturalWidth) go(); else p.img.addEventListener('load',go,{once:true});
+  }
+  function hidePhoto(dur,cb){ const m=photoMesh; photoMesh=null; photoOn=false; if(!m){cb&&cb(); return;} fadeTo(m,0,dur,()=>{m.visible=false; cb&&cb()}) }
+  // Durchgänge, die im Foto zu sehen sind, als Pfeil im Bild; die übrigen als Pfeil am Boden
+  const spots=[];
+  function clearSpots(){ spots.forEach(b=>b.remove()); spots.length=0 }
+  function buildSpots(id){
+    clearSpots(); const covered=new Set(); if(!PH[id]) return covered;
+    PH[id].hots.filter(h=>!h.back).forEach(h=>{ covered.add(h.to);
+      const b=document.createElement('button'); b.type='button'; b.className='spot';
+      b.innerHTML='<svg viewBox="0 0 44 30" aria-hidden="true"><path d="M4 26 L22 6 L40 26 L32 26 L22 15 L12 26 Z" fill="#fff"/></svg><span>'+full(room(h.to))+'</span>';
+      b.setAttribute('aria-label','Weiter: '+full(room(h.to))); b.addEventListener('click',()=>walk(h.to));
+      b._p=null; b._h=h; b._id=id; sv.appendChild(b); spots.push(b) });
+    return covered;
+  }
+
+  /* ---------- Eingabe 3D ---------- */
+  const ray=new THREE.Raycaster(), m2=new THREE.Vector2(); let drag=null;
+  function setRay(e){const r=cv.getBoundingClientRect(); m2.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1); ray.setFromCamera(m2,camera)}
+  function pickArrow(e){setRay(e); const o=[]; arrows.forEach(a=>a.traverse(x=>{if(x.isMesh)o.push(x)})); const h=ray.intersectObjects(o,false)[0]; return h?h.object.userData.to:null}
+  function pickRoom(e){setRay(e); const h=ray.intersectObjects(floorG.children,false).find(x=>x.object.userData.room); return h?h.object.userData.room:null}
+  cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,yaw,pitch,moved:false}});
+  cv.addEventListener('pointermove',e=>{
+    if(drag&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>5) drag.moved=true;
+    if(mode==='inside'){
+      if(drag&&e.buttons){ cv.classList.add('drag'); const k=(camera.fov/72)*.0042; yaw=drag.yaw+(e.clientX-drag.x)*k; pitch=Math.max(-1.2,Math.min(1.2,drag.pitch+(e.clientY-drag.y)*k)); }
+      else cv.classList.toggle('hot',!!pickArrow(e));
+    } else if(mode==='house'&&!e.buttons) cv.classList.toggle('hot',!!pickRoom(e));
+  });
+  window.addEventListener('pointerup',e=>{
+    if(drag&&!drag.moved&&e.target===cv){
+      if(mode==='inside'){const to=pickArrow(e); if(to) walk(to)}
+      else if(mode==='house'){const r=pickRoom(e); if(r) enter(r)}
+    }
+    drag=null; cv.classList.remove('drag');
+  });
+  cv.addEventListener('wheel',e=>{ if(mode!=='inside') return; e.preventDefault(); camera.fov=Math.max(onlyOn?20:40,Math.min(85,camera.fov+e.deltaY*.03)); camera.updateProjectionMatrix() },{passive:false});
+  document.addEventListener('keydown',e=>{
+    if(mode!=='inside') return;
+    if(e.key==='ArrowLeft'){yaw+=.15;e.preventDefault()} else if(e.key==='ArrowRight'){yaw-=.15;e.preventDefault()}
+    else if(e.key==='Escape') leave();
+  });
+  $('out').addEventListener('click',()=>leave());
+  $('low').addEventListener('click',()=>{low=!low; $('low').setAttribute('aria-pressed',String(low)); $('low').textContent=low?'Wände einblenden':'Wände ausblenden'; wallG.scale.y=low?.38:1});
+  $('fs').addEventListener('click',()=>{try{ if(document.fullscreenElement) document.exitFullscreen(); else $('tourbox').requestFullscreen().catch(()=>{$('fs').hidden=true}) }catch(e){$('fs').hidden=true}});
+  if(!sv.requestFullscreen) $('fs').hidden=true;
+
+  /* ---------- KI-Ergänzung (optional, über Higgsfield) ----------
+     Standard ist ohne Generierung. Auf Knopfdruck erzeugt Higgsfield ein 360°-Bild des Raums.
+     Die Seite nutzt dafür den Higgsfield-Connector des Betrachters (kein API-Schlüssel im Code). */
+  const KI_BASE='Seamless equirectangular 360 x 180 degree panorama, exactly 2:1, camera at eye height in the middle of the room, level horizon. Empty room in a renovated German Altbau attic apartment, real estate photography, bright natural daylight, white painted walls and ceiling, light beech laminate floor with light wooden skirting boards, beech wood door frames and doors, no furniture, no people, no text, no watermark, photorealistic. ';
+  const KI_ROOM={
+    flur:'Narrow hallway about 1.1 m wide and 3.5 m long. Beech doors and door frames on both long sides, an open doorway at the far end, a frosted glass pendant lamp, an intercom handset and a white fuse box on the wall.',
+    z16:'Room about 4 x 4.4 m. On one wall two separate white double casement windows with transom lights, deep window reveals, a white panel radiator under each window. A bare bulb hangs from the ceiling. One beech door.',
+    z10:'Narrow room about 2.2 m wide and 4.7 m long. One white window on the short wall, one beech door near the opposite corner, smoke detector on the ceiling.',
+    z14:'Room about 3.2 x 4.4 m. Two white double casement windows with transom lights side by side on one wall, a white panel radiator under each, sockets near the floor. One beech door.',
+    bad:'Small bathroom about 1.5 x 3.2 m. White marble-look wall tiles up to about 2 m, white diagonal floor tiles, a white built-in bathtub along one long wall, a wall-hung white sink and a white toilet on the other side, a small white window at the end, a white radiator.'
+  };
+  const panos={}; let kiOn=true, kiBusy=false;
+  const sphere=new THREE.Mesh(new THREE.SphereGeometry(30,64,40),new THREE.MeshBasicMaterial({depthWrite:false,fog:false}));
+  sphere.geometry.scale(-1,1,1); sphere.visible=false; sphere.renderOrder=-1; scene.add(sphere);
+  function modelVisible(v){ [floorG,wallG,ceilG,fixG,envG].forEach(g=>g.visible=v); if(v){ ceilG.visible=mode!=='house'; envG.visible=mode!=='house'; furnG.visible=mode==='house' } }
+  // Nur echtes Foto: Modell rundherum ausblenden, Blick auf das Foto begrenzen (außer eine KI-Ergänzung ist eingeblendet)
+  let onlyOn=false, onlyFov=56;
+  function photoOnly(){
+    const p=PH[cur], want=mode==='inside'&&!walkA&&photoOn&&!!p&&!!p.mesh&&!sphere.visible;
+    if(want!==onlyOn){ onlyOn=want;
+      if(want){ modelVisible(false); scene.background.copy(STAGE) } else if(!sphere.visible){ modelVisible(true); scene.background.copy(SKY); camera.fov=56; camera.updateProjectionMatrix() }
+      if(p&&p.mesh){ p.mesh.material.map=want||!sphere.visible?p.texPlain:p.texSoft; p.mesh.material.needsUpdate=true }
+    }
+    if(!onlyOn) return;
+    const vf=2*Math.atan(Math.tan(PFOV/2)/p.ratio), a=camera.aspect||1.5;
+    onlyFov=Math.min(vf,2*Math.atan(Math.tan(PFOV/2)/a))*.98;
+    const f=Math.max(onlyFov*.45,Math.min(onlyFov,camera.fov*PI/180)); if(Math.abs(f-camera.fov*PI/180)>1e-4){ camera.fov=f*180/PI; camera.updateProjectionMatrix() }
+    const hv=Math.atan(Math.tan(f/2)*a), Y=NODES[cur][2], my=Math.max(0,PFOV/2-hv), mp=Math.max(0,vf/2-f/2);
+    const d=nearAngle(Y,yaw)-Y; yaw=Y+Math.max(-my,Math.min(my,d)); pitch=Math.max(-mp,Math.min(mp,pitch));
+  }
+  function applyPano(){
+    const p=mode==='inside'&&cur&&kiOn?panos[cur]:null;
+    if(p){ sphere.material.map=p.tex; sphere.material.needsUpdate=true; sphere.rotation.y=NODES[cur][2]+PI/2; sphere.visible=true; modelVisible(false); onlyOn=false; camera.fov=56; camera.updateProjectionMatrix(); const m=PH[cur]&&PH[cur].mesh; if(m){ m.material.map=PH[cur].texSoft; m.material.needsUpdate=true } }
+    else if(sphere.visible){ sphere.visible=false; modelVisible(true); }
+    $('kitag').hidden=!p; $('kioff').hidden=!(cur&&panos[cur]); $('kioff').textContent=kiOn?'KI-Ergänzung ausblenden':'KI-Ergänzung einblenden'; $('kioff').setAttribute('aria-pressed',String(kiOn));
+  }
+  function kiStatus(t,err){ const e=$('kist'); e.textContent=t||''; e.classList.toggle('err',!!err) }
+  function syncKi(){ const show=mode==='inside'&&!!PH[cur]&&!!(window.claude&&window.claude.use); $('kiwrap').hidden=!show; if(!show){ $('kip').hidden=true; $('ki').setAttribute('aria-expanded','false') } applyPano() }
+  $('ki').addEventListener('click',()=>{ const o=$('kip').hidden; $('kip').hidden=!o; $('ki').setAttribute('aria-expanded',String(o)); if(o&&!kiBusy) kiStatus('') });
+  $('kioff').addEventListener('click',()=>{ kiOn=!kiOn; applyPano() });
+  function setPanoFromBlob(id,blob,src){
+    const url=URL.createObjectURL(blob);
+    new THREE.TextureLoader().load(url,tex=>{ tex.minFilter=THREE.LinearFilter; if(panos[id]) panos[id].tex.dispose(); panos[id]={tex,src}; kiOn=true; applyPano();
+      const r=tex.image.width/tex.image.height; kiStatus('KI-Ergänzung eingesetzt. Ziehen zum Umschauen.'+(r<1.8||r>2.2?' Hinweis: Das Bild ist nicht im Format 2:1, es kann verzerrt wirken.':'')) },
+      undefined,()=>kiStatus('Das Bild ließ sich nicht laden.',true));
+  }
+  $('kifile').addEventListener('change',e=>{ const f=e.target.files[0]; e.target.value=''; if(!f||!cur) return;
+    if(!/^image\/(jpeg|png|webp)$/.test(f.type)){ kiStatus('Bitte ein JPG, PNG oder WebP wählen.',true); return }
+    setPanoFromBlob(cur,f,'datei') });
+  // Hilfen zum Lesen der Higgsfield-Antworten (Form nicht fest dokumentiert, daher tolerant)
+  const UUID=/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+  function findKey(o,keys,depth){ if(!o||typeof o!=='object'||depth>6) return null; for(const k of keys){ if(typeof o[k]==='string') return o[k] }
+    for(const v of Object.values(o)){ const r=findKey(v,keys,(depth||0)+1); if(r) return r } return null }
+  function findImageUrl(o){ const t=JSON.stringify(o||''); const m=t.match(/https:\/\/[^"\s]+?\.(?:png|jpe?g|webp)(?:\?[^"\s]*)?/i); return m?m[0].replace(/\\u0026/g,'&'):null }
+  function kiErr(e){
+    const c=e&&e.code, srv='Higgsfield';
+    if(c==='server_not_connected'||c==='selection_required') return 'Higgsfield ist bei dir nicht verbunden. Füge es in claude.ai unter Einstellungen → Connectors hinzu.';
+    if(c==='needs_reauth') return 'Die Higgsfield-Anmeldung ist abgelaufen. Verbinde Higgsfield in claude.ai unter Einstellungen → Connectors neu.';
+    if(c==='not_in_manifest'||c==='approval_required'||c==='consent_required') return 'Die Seite darf Higgsfield noch nicht nutzen. Erlaube es, wenn claude.ai danach fragt, und tippe erneut.';
+    if(c==='blocked_by_policy') return 'Higgsfield ist für dein Konto gesperrt.';
+    if(c==='server_unavailable'||c==='upstream_error') return srv+' antwortet gerade nicht. Möglicherweise läuft der Auftrag trotzdem, schau in deinem Higgsfield-Verlauf nach, bevor du erneut tippst.';
+    if(c==='tool_error'){ const m=String(e.message||''); return /credit|balance|insufficient|guthaben/i.test(m)?'Higgsfield meldet zu wenig Credits. Lade Credits auf und tippe erneut.':'Higgsfield meldet: '+m.slice(0,240) }
+    return 'Die Erzeugung hat nicht geklappt'+(c?' ('+c+')':'')+'.';
+  }
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  $('kigo').addEventListener('click',async()=>{
+    if(kiBusy||!cur||!PH[cur]) return; const id=cur; kiBusy=true; $('kigo').disabled=true; $('kires').hidden=true;
+    try{
+      const mcp=window.claude&&window.claude.use?await window.claude.use('mcp'):null;
+      if(!mcp){ kiStatus('In dieser Ansicht ist Higgsfield nicht erreichbar. Öffne die Seite in claude.ai, angemeldet mit deinem Konto.',true); return }
+      kiStatus('Auftrag wird an Higgsfield geschickt …');
+      const res=await mcp.callTool('Higgsfield','generate_image',{params:{model:'flux_3_image',prompt:KI_BASE+KI_ROOM[id],aspect_ratio:'2:1',resolution:'2k',use_unlim:false}},{cache:false});
+      const pay=res.payload!==undefined?res.payload:res;
+      const job=findKey(pay,['job_id','id','jobId'])||((JSON.stringify(pay).match(UUID)||[])[0]);
+      if(!job){ kiStatus('Higgsfield hat keinen Auftrag zurückgegeben: '+JSON.stringify(pay).slice(0,200),true); return }
+      const t0=Date.now(); let url=null, failed=null;
+      while(Date.now()-t0<6*60*1000){
+        kiStatus('Higgsfield rechnet … '+Math.round((Date.now()-t0)/1000)+' s');
+        let w; try{ w=await mcp.callTool('Higgsfield','jobs_wait',{jobs:[{index:0,job_id:job}],timeout_seconds:15},{cache:false}) }catch(e){ if(e&&e.retryable){ await sleep(4000); continue } throw e }
+        const wp=w.payload!==undefined?w.payload:w, txt=JSON.stringify(wp);
+        url=findImageUrl(wp); if(url) break;
+        if(/"(failed|nsfw|ip_detected|cancel+ed)"/i.test(txt)){ failed=findKey(wp,['error','reason'])||'fehlgeschlagen'; break }
+        await sleep(2000);
+      }
+      if(failed){ kiStatus('Higgsfield konnte das Bild nicht erzeugen: '+failed,true); return }
+      if(!url){ kiStatus('Higgsfield braucht länger als erwartet. Das Bild erscheint später in deinem Higgsfield-Verlauf.',true); return }
+      $('kires').href=url; $('kires').hidden=false;
+      try{ const r=await fetch(url); if(!r.ok) throw 0; setPanoFromBlob(id,await r.blob(),url) }
+      catch(e){ kiStatus('Fertig. Diese Vorschau darf fremde Bilder nicht direkt laden: Öffne das Ergebnis, speichere es und setze es mit „Fertiges 360°-Bild einsetzen“ ein. Auf der eigenen Website passiert das automatisch.') }
+    }catch(e){ kiStatus(kiErr(e),true) }
+    finally{ kiBusy=false; $('kigo').disabled=false }
+  });
+
+  /* Raumleiste */
+  const ORDER=['flur','bad','kueche','z10','z14','z16'];
+  const roomsUl=$('rooms'), roomSel=$('roomsel');
+  roomsUl.innerHTML=ORDER.map(id=>{const r=room(id); return '<li><button type="button" data-id="'+id+'">'+r.name+'<small>'+fmt(r.qm)+' m²</small></button></li>'}).join('');
+  roomSel.innerHTML='<option value="">Raum wählen …</option>'+ORDER.map(id=>{const r=room(id); return '<option value="'+id+'">'+r.name+' · '+fmt(r.qm)+' m²</option>'}).join('');
+  function goRoom(id){ if(!id||fly||walkA) return; if(mode==='house') enter(id); else if(mode==='inside'&&id!==cur) walk(id,true); }
+  roomsUl.addEventListener('click',e=>{const b=e.target.closest('button'); if(b) goRoom(b.dataset.id)});
+  roomSel.addEventListener('change',()=>goRoom(roomSel.value));
+  roomsUl.addEventListener('mouseover',e=>{const b=e.target.closest('button'); labels.forEach(l=>l.classList.toggle('hl',!!b&&l._r.id===b.dataset.id))});
+  roomsUl.addEventListener('mouseleave',()=>labels.forEach(l=>l.classList.remove('hl')));
+  let navCur;
+  function syncNav(){ const c=mode==='inside'?cur:null; if(c===navCur) return; navCur=c;
+    roomsUl.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.id===c)); roomSel.value=c||''; }
+
+  // Eckdaten
+  const tot=ROOMS.reduce((s,r)=>s+r.qm,0);
+  $('facts').innerHTML=[['Wohnfläche',fmt(tot)+' m²'],['Zimmer','3'],['Lage','Dachgeschoss'],['Fotos','5 von 6 Räumen']].map(([a,b])=>'<div><span>'+a+'</span><b>'+b+'</b></div>').join('');
+
+  /* ---------- Mini-Grundriss ---------- */
+  const map=$('map'), mc=map.getContext('2d'), S=32, OX=1.4*S+14, OY=14;
+  function drawMap(){
+    mc.clearRect(0,0,map.width,map.height);
+    ROOMS.forEach(r=>{ mc.fillStyle=r.id===cur?'#e2e2de':'#fafaf8'; mc.fillRect(OX+r.x[0]*S,OY+r.z[0]*S,(r.x[1]-r.x[0])*S,(r.z[1]-r.z[0])*S) });
+    mc.strokeStyle='#111'; mc.lineWidth=3; ROOMS.forEach(r=>mc.strokeRect(OX+r.x[0]*S,OY+r.z[0]*S,(r.x[1]-r.x[0])*S,(r.z[1]-r.z[0])*S));
+    mc.fillStyle='#fafaf8'; DOORS.forEach(d=>{ if(d.l==='z') mc.fillRect(OX+d.a*S,OY+d.c*S-3,(d.b-d.a)*S,6); else mc.fillRect(OX+d.c*S-3,OY+d.a*S,6,(d.b-d.a)*S) });
+    Object.keys(NODES).forEach(id=>{ if(id===cur) return; const [x,z]=NODES[id]; mc.fillStyle='#9a9a9a'; mc.fillRect(OX+x*S-4,OY+z*S-4,8,8) });
+    const vy=yaw, px=OX+pos.x*S, pz=OY+pos.z*S, half=(camera.fov*PI/180)/2*Math.max(1,camera.aspect)*.75;
+    mc.beginPath(); mc.moveTo(px,pz); mc.arc(px,pz,50,PI/2-vy-half,PI/2-vy+half); mc.closePath(); mc.fillStyle='rgba(17,17,17,.18)'; mc.fill();
+    mc.beginPath(); mc.arc(px,pz,7,0,7); mc.fillStyle='#111'; mc.fill(); mc.lineWidth=2.5; mc.strokeStyle='#fff'; mc.stroke();
+  }
+  map.addEventListener('click',e=>{
+    const r=map.getBoundingClientRect(), x=((e.clientX-r.left)/r.width*map.width-OX)/S, z=((e.clientY-r.top)/r.height*map.height-OY)/S;
+    const hit=ROOMS.find(q=>x>=q.x[0]&&x<=q.x[1]&&z>=q.z[0]&&z<=q.z[1]); if(hit) walk(hit.id,true);
+  });
+
+  /* ---------- Schleife ---------- */
+  const v=new THREE.Vector3();
+  function project(el,p3){ v.copy(p3).project(camera); const w=sv.clientWidth,h=sv.clientHeight, vis=v.z<1&&Math.abs(v.x)<1.1&&Math.abs(v.y)<1.1;
+    el.style.display=vis?'':'none'; el.style.transform='translate('+((v.x*.5+.5)*w)+'px,'+((-v.y*.5+.5)*h)+'px) translate(-50%,-50%)' }
+  function resize(){const w=sv.clientWidth,h=sv.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();}
+  new ResizeObserver(resize).observe(sv); resize();
+  ceilG.visible=false; showEnv(false);
+  camera.position.copy(ovPos()); controls.target.copy(C); controls.update();
+  function loop(now){
+    if(fly) stepFly(now);
+    else if(mode==='house') controls.update();
+    else if(mode==='inside'){
+      if(walkA){
+        const t=Math.max(0,Math.min(1,(now-walkA.t0)/walkA.dur)), e=ease(t), p=walkA.pts;
+        if(e<.5){pos.lerpVectors(p[0],p[1],e*2); yaw=walkA.y0+(walkA.y1-walkA.y0)*Math.min(1,e*3)}
+        else{pos.lerpVectors(p[1],p[2],(e-.5)*2); yaw=walkA.y1+(walkA.y2-walkA.y1)*Math.min(1,(e-.5)*2.5)}
+        pos.y=EYE+Math.sin(e*PI*4)*.012;
+        if(t>=1){const to=walkA.to; walkA=null; arrive(to,true)}
+      }
+      photoOnly(); camera.position.copy(pos); camera.rotation.set(pitch,yaw+PI,0);
+    }
+    if(sphere.visible) sphere.position.copy(camera.position);
+    if(pfade){const t=Math.max(0,Math.min(1,(now-pfade.t0)/pfade.dur)); pfade.m.material.opacity=pfade.from+(pfade.to-pfade.from)*t; if(t>=1){const d=pfade.done; pfade=null; d&&d()}}
+    renderer.render(scene,camera);
+    if(mode==='house') labels.forEach(l=>{ const r=l._r; project(l,new THREE.Vector3((r.x[0]+r.x[1])/2,low?1.2:.4,(r.z[0]+r.z[1])/2)) });
+    if(mode==='inside'){ tags.forEach(t=>project(t,t._p)); spots.forEach(b=>{ if(!b._p) b._p=photoPoint(b._id,b._h.x,b._h.y); project(b,b._p); b.style.visibility=photoOn?'':'hidden' }); drawMap(); }
+    syncNav(); requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  window.__tour={enter,leave,walk,look:(y,p)=>{yaw=y;if(p!=null)pitch=p},state:()=>({mode,cur,photoOn,yaw})};
+})();
+</script>
+</body>
+</html>

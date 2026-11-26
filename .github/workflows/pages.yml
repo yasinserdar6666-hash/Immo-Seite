@@ -26,7 +26,7 @@ jobs:
         run: |
           mkdir _site
           cp index.html einbettung-test.html _site/
-          cp -r prototypes _site/
+          cp -r prototypes wohnung-10 _site/
           touch _site/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
